@@ -1,0 +1,38 @@
+import 'dotenv/config';
+import { join } from 'node:path';
+import { DataSource, type DataSourceOptions } from 'typeorm';
+import type { SeederOptions } from 'typeorm-extension';
+import {
+  addTransactionalDataSource,
+  initializeTransactionalContext,
+  StorageDriver,
+} from 'typeorm-transactional';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+
+const dataSource = new DataSource({
+  type: 'postgres',
+  host: process.env.POSTGRES_HOST,
+  port: Number(process.env.POSTGRES_PORT),
+  username: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+  database: process.env.POSTGRES_DATABASE,
+
+  entities: [join(__dirname, '**/*.entity.{ts,js}')],
+  migrations: [join(__dirname, 'database/migrations/*.{ts,js}')],
+
+  seeds: [join(__dirname, 'database/seeds/*.{ts,js}')],
+  factories: [],
+
+  synchronize: false,
+  logging: true,
+
+  namingStrategy: new SnakeNamingStrategy(),
+} as DataSourceOptions & SeederOptions);
+
+initializeTransactionalContext({
+  storageDriver: StorageDriver.ASYNC_LOCAL_STORAGE,
+});
+
+addTransactionalDataSource(dataSource);
+
+export default dataSource;

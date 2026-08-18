@@ -1,0 +1,622 @@
+Enum user_role {
+  customer
+  vendor
+  admin
+}
+
+Enum user_status {
+  active
+  disabled
+  suspended
+}
+
+Enum auth_provider {
+  email
+  google
+}
+
+Enum product_status {
+  draft
+  active
+  inactive
+  out_of_stock
+  deleted
+}
+
+Enum order_status {
+  pending
+  confirmed
+  processing
+  shipped
+  delivered
+  cancelled
+  partially_cancelled
+  completed
+}
+
+Enum order_item_status {
+  pending
+  confirmed
+  processing
+  shipped
+  delivered
+  cancelled
+}
+
+Enum payment_status {
+  pending
+  paid
+  failed
+  refunded
+  partially_refunded
+}
+
+Enum payment_method {
+  cod
+  card
+  upi
+  net_banking
+  wallet
+}
+
+Enum coupon_type {
+  percentage
+  fixed
+  free_shipping
+}
+
+Enum discount_type {
+  coupon
+  promotion
+  manual
+}
+
+Enum tracking_status {
+  order_placed
+  order_confirmed
+  processing
+  packed
+  shipped
+  out_for_delivery
+  delivered
+  cancelled
+}
+
+Enum cancellation_reason_type {
+  customer
+  vendor
+  admin
+  system
+}
+
+Enum address_type {
+  home
+  work
+  other
+}
+
+
+Table users {
+  id uuid [pk]
+  email varchar(255) [unique, null]
+  mobile_number varchar(20) [unique, null]
+  password_hash varchar(255) [null]
+  role user_role [not null]
+  status user_status [not null, default: 'active']
+  auth_provider auth_provider [not null, default: 'email']
+  google_id varchar(255) [unique, null]
+
+  joined_at timestamp [not null, default: `now()`]
+  last_login_at timestamp [null]
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+
+  Note: "At least one authentication method should be present. Disabled vendors cannot login."
+}
+
+Table user_profiles {
+  id uuid [pk]
+  user_id uuid [not null, unique]
+
+  first_name varchar(100)
+  last_name varchar(100)
+  profile_picture_url varchar(500)
+  date_of_birth date
+  gender varchar(30)
+
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+Table password_resets {
+  id uuid [pk]
+  user_id uuid [not null]
+  token_hash varchar(255) [not null, unique]
+  expires_at timestamp [not null]
+  used_at timestamp [null]
+  created_at timestamp [not null, default: `now()`]
+}
+
+/* =========================
+VENDOR
+========================= */
+
+Table vendor_profiles {
+  id uuid [pk]
+  user_id uuid [not null, unique]
+
+  business_name varchar(255) [not null]
+  business_description text
+  business_email varchar(255)
+  business_phone varchar(20)
+
+  business_logo_url varchar(500)
+  tax_number varchar(100)
+  registration_number varchar(100)
+
+  is_verified boolean [not null, default: false]
+
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+/* =========================
+ADMIN
+========================= */
+
+Table admin_profiles {
+  id uuid [pk]
+  user_id uuid [not null, unique]
+
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+/* =========================
+ADDRESSES
+========================= */
+
+Table addresses {
+  id uuid [pk]
+  user_id uuid [not null]
+
+  address_type address_type [not null, default: 'home']
+  full_name varchar(200) [not null]
+  mobile_number varchar(20) [not null]
+
+  address_line_1 varchar(255) [not null]
+  address_line_2 varchar(255)
+  landmark varchar(255)
+
+  city varchar(100) [not null]
+  state varchar(100) [not null]
+  country varchar(100) [not null, default: 'India']
+  postal_code varchar(20) [not null]
+
+  is_default boolean [not null, default: false]
+
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+/* =========================
+CATEGORIES
+========================= */
+
+Table categories {
+  id uuid [pk]
+  parent_id uuid [null]
+
+  name varchar(150) [not null]
+  slug varchar(180) [not null, unique]
+  description text
+  image_url varchar(500)
+
+  is_active boolean [not null, default: true]
+
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+/* =========================
+PRODUCTS
+========================= */
+
+Table products {
+  id uuid [pk]
+
+  vendor_id uuid [not null]
+  category_id uuid [not null]
+
+  name varchar(255) [not null]
+  slug varchar(300) [not null, unique]
+  description text
+
+  sku varchar(100) [not null, unique]
+
+  price decimal(12,2) [not null]
+  compare_at_price decimal(12,2)
+  cost_price decimal(12,2)
+
+  stock_quantity int [not null, default: 0]
+  low_stock_threshold int [not null, default: 5]
+
+  status product_status [not null, default: 'draft']
+
+  weight decimal(10,2)
+  weight_unit varchar(20)
+
+  tax_rate decimal(5,2) [not null, default: 0]
+
+  total_sold int [not null, default: 0]
+  view_count int [not null, default: 0]
+
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+  deleted_at timestamp [null]
+
+  Note: "Best-selling products can be determined from total_sold or aggregated order_items."
+}
+
+Table product_images {
+  id uuid [pk]
+  product_id uuid [not null]
+
+  image_url varchar(500) [not null]
+  alt_text varchar(255)
+  sort_order int [not null, default: 1]
+  is_primary boolean [not null, default: false]
+
+  created_at timestamp [not null, default: `now()`]
+
+  Note: "Application should enforce a maximum of 4 active images per product."
+}
+
+Table product_variants {
+  id uuid [pk]
+  product_id uuid [not null]
+
+  name varchar(150) [not null]
+  sku varchar(100) [unique]
+  price decimal(12,2)
+  stock_quantity int [not null, default: 0]
+
+  attributes jsonb
+
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+/* =========================
+CART
+========================= */
+
+Table carts {
+  id uuid [pk]
+  user_id uuid [not null, unique]
+
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+Table cart_items {
+  id uuid [pk]
+  cart_id uuid [not null]
+  product_id uuid [not null]
+  variant_id uuid [null]
+
+  quantity int [not null, default: 1]
+  unit_price decimal(12,2) [not null]
+
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+/* =========================
+COUPONS & DISCOUNTS
+========================= */
+
+Table coupons {
+  id uuid [pk]
+
+  code varchar(50) [not null, unique]
+  description varchar(255)
+
+  coupon_type coupon_type [not null]
+  value decimal(12,2) [not null]
+
+  minimum_order_amount decimal(12,2)
+  maximum_discount_amount decimal(12,2)
+
+  usage_limit int
+  usage_count int [not null, default: 0]
+
+  starts_at timestamp [not null]
+  expires_at timestamp [not null]
+
+  is_active boolean [not null, default: true]
+
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+Table coupon_user_usage {
+  id uuid [pk]
+  coupon_id uuid [not null]
+  user_id uuid [not null]
+  order_id uuid [not null]
+
+  discount_amount decimal(12,2) [not null]
+
+  used_at timestamp [not null, default: `now()`]
+}
+
+/* =========================
+ORDERS
+========================= */
+
+Table orders {
+  id uuid [pk]
+
+  order_number varchar(50) [not null, unique]
+
+  customer_id uuid [not null]
+
+  status order_status [not null, default: 'pending']
+  payment_status payment_status [not null, default: 'pending']
+  payment_method payment_method [not null]
+
+  subtotal decimal(12,2) [not null, default: 0]
+  tax_amount decimal(12,2) [not null, default: 0]
+  shipping_amount decimal(12,2) [not null, default: 0]
+  discount_amount decimal(12,2) [not null, default: 0]
+
+  total_amount decimal(12,2) [not null, default: 0]
+
+  coupon_code varchar(50)
+
+  /* Snapshot of address at time of purchase */
+  shipping_full_name varchar(200) [not null]
+  shipping_mobile_number varchar(20) [not null]
+  shipping_address_line_1 varchar(255) [not null]
+  shipping_address_line_2 varchar(255)
+  shipping_landmark varchar(255)
+  shipping_city varchar(100) [not null]
+  shipping_state varchar(100) [not null]
+  shipping_country varchar(100) [not null]
+  shipping_postal_code varchar(20) [not null]
+
+  placed_at timestamp [not null, default: `now()`]
+  confirmed_at timestamp
+  shipped_at timestamp
+  delivered_at timestamp
+  cancelled_at timestamp
+
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+
+  Note: "Customer cancellation is allowed only within 24 hours of placed_at, subject to business rules."
+}
+
+Table order_items {
+  id uuid [pk]
+
+  order_id uuid [not null]
+  product_id uuid [not null]
+  vendor_id uuid [not null]
+  variant_id uuid [null]
+
+  product_name varchar(255) [not null]
+  sku varchar(100)
+
+  quantity int [not null]
+  unit_price decimal(12,2) [not null]
+
+  tax_rate decimal(5,2) [not null, default: 0]
+  tax_amount decimal(12,2) [not null, default: 0]
+
+  discount_amount decimal(12,2) [not null, default: 0]
+  total_amount decimal(12,2) [not null]
+
+  status order_item_status [not null, default: 'pending']
+
+  cancelled_at timestamp
+  delivered_at timestamp
+
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+
+  Note: "vendor_id allows vendors to see only their own products/orders."
+}
+
+/* =========================
+ORDER TRACKING
+========================= */
+
+Table order_tracking {
+  id uuid [pk]
+
+  order_id uuid [not null]
+  order_item_id uuid [null]
+
+  status tracking_status [not null]
+  description varchar(500)
+
+  location varchar(255)
+  tracking_number varchar(150)
+  courier_name varchar(150)
+
+  created_at timestamp [not null, default: `now()`]
+}
+
+/* =========================
+ORDER CANCELLATIONS
+========================= */
+
+Table order_cancellations {
+  id uuid [pk]
+
+  order_id uuid [not null]
+  order_item_id uuid [null]
+
+  cancelled_by_user_id uuid [not null]
+  reason_type cancellation_reason_type [not null]
+  reason text
+
+  refund_amount decimal(12,2) [not null, default: 0]
+
+  cancelled_at timestamp [not null, default: `now()`]
+
+  Note: "order_item_id is used when only a vendor/product line is cancelled."
+}
+
+/* =========================
+PAYMENTS
+========================= */
+
+Table payments {
+  id uuid [pk]
+
+  order_id uuid [not null, unique]
+
+  transaction_id varchar(255) [unique]
+  payment_gateway varchar(100)
+
+  amount decimal(12,2) [not null]
+  status payment_status [not null, default: 'pending']
+
+  paid_at timestamp
+  refunded_at timestamp
+
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+/* =========================
+VENDOR EARNINGS
+========================= */
+
+Table vendor_earnings {
+  id uuid [pk]
+
+  vendor_id uuid [not null]
+  order_id uuid [not null]
+  order_item_id uuid [not null]
+
+  gross_amount decimal(12,2) [not null]
+  tax_amount decimal(12,2) [not null, default: 0]
+  commission_amount decimal(12,2) [not null, default: 0]
+  refund_amount decimal(12,2) [not null, default: 0]
+
+  net_earning decimal(12,2) [not null]
+
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+/* =========================
+PRODUCT REVIEWS
+========================= */
+
+Table product_reviews {
+  id uuid [pk]
+
+  product_id uuid [not null]
+  user_id uuid [not null]
+  order_item_id uuid [not null]
+
+  rating int [not null]
+  title varchar(255)
+  comment text
+
+  is_verified_purchase boolean [not null, default: true]
+  is_visible boolean [not null, default: true]
+
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp [not null, default: `now()`]
+}
+
+/* =========================
+NOTIFICATIONS
+========================= */
+
+Table notifications {
+  id uuid [pk]
+
+  user_id uuid [not null]
+
+  title varchar(255) [not null]
+  message text [not null]
+
+  type varchar(100)
+  reference_id uuid
+
+  is_read boolean [not null, default: false]
+
+  created_at timestamp [not null, default: `now()`]
+}
+
+/* =========================
+RELATIONSHIPS
+========================= */
+
+/* Users */
+Ref: user_profiles.user_id - users.id
+Ref: vendor_profiles.user_id - users.id
+Ref: admin_profiles.user_id - users.id
+Ref: password_resets.user_id > users.id
+
+/* Addresses */
+Ref: addresses.user_id > users.id
+
+/* Categories */
+Ref: categories.parent_id > categories.id
+
+/* Products */
+Ref: products.vendor_id > users.id
+Ref: products.category_id > categories.id
+Ref: product_images.product_id > products.id
+Ref: product_variants.product_id > products.id
+
+/* Cart */
+Ref: carts.user_id - users.id
+Ref: cart_items.cart_id > carts.id
+Ref: cart_items.product_id > products.id
+Ref: cart_items.variant_id > product_variants.id
+
+/* Coupons */
+Ref: coupon_user_usage.coupon_id > coupons.id
+Ref: coupon_user_usage.user_id > users.id
+Ref: coupon_user_usage.order_id > orders.id
+
+/* Orders */
+Ref: orders.customer_id > users.id
+Ref: order_items.order_id > orders.id
+Ref: order_items.product_id > products.id
+Ref: order_items.vendor_id > users.id
+Ref: order_items.variant_id > product_variants.id
+
+/* Order Tracking */
+Ref: order_tracking.order_id > orders.id
+Ref: order_tracking.order_item_id > order_items.id
+
+/* Cancellations */
+Ref: order_cancellations.order_id > orders.id
+Ref: order_cancellations.order_item_id > order_items.id
+Ref: order_cancellations.cancelled_by_user_id > users.id
+
+/* Payments */
+Ref: payments.order_id - orders.id
+
+/* Vendor Earnings */
+Ref: vendor_earnings.vendor_id > users.id
+Ref: vendor_earnings.order_id > orders.id
+Ref: vendor_earnings.order_item_id > order_items.id
+
+/* Reviews */
+Ref: product_reviews.product_id > products.id
+Ref: product_reviews.user_id > users.id
+Ref: product_reviews.order_item_id > order_items.id
+
+/* Notifications */
+Ref: notifications.user_id > users.id
