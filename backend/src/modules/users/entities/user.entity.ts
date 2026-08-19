@@ -1,13 +1,17 @@
 import {
   Column,
   CreateDateColumn,
+  Entity,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import UserRoleEnums from '../enums/user.role';
 import UserStatusEnum from '../enums/user.status';
 import AuthProviderEnum from 'src/modules/auth/enums/auth.provider';
+import { UserProfile } from './user-profile.entity';
 
+@Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -48,12 +52,15 @@ export class User {
   @CreateDateColumn()
   joinedAt!: Date;
 
-  @Column({ type: 'timestamp' })
-  lastLoginAt!: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  lastLoginAt?: Date;
 
   @CreateDateColumn()
   createdAt!: Date;
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
+  @OneToOne(() => UserProfile, (profile) => profile.user)
+  profile!: UserProfile;
 }

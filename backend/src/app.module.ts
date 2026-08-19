@@ -54,10 +54,10 @@ import { JwtAuthGuard } from './modules/common/guards/jwt-auth.guard';
       provide: APP_INTERCEPTOR,
       useClass: TransformInterceptor,
     },
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: JwtAuthGuard,
+    // },
   ],
 })
 export class AppModule {}

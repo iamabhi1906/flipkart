@@ -1,0 +1,463 @@
+openapi: 3.0.0
+
+info:
+  title: Ecommerce website
+  description: API documentation for users
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:5050
+    description: Development Server
+
+tags:
+  - name: Users
+    description: User management APIs
+
+paths:
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Retrieve a list of users
+      description: Returns a paginated list of users with optional search and status filters.
+
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            example: 1
+
+        - name: limit
+          in: query
+          description: Number of users to return per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 10
+            example: 10
+
+        - name: search
+          in: query
+          description: Search by email, mobile number, first name, or last name
+          required: false
+          schema:
+            type: string
+            example: john
+
+        - name: status
+          in: query
+          description: Filter users by status
+          required: false
+          schema:
+            type: string
+            enum:
+              - ACTIVE
+              - INACTIVE
+              - BLOCKED
+            example: ACTIVE
+
+      responses:
+        '200':
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListResponse'
+
+        '400':
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - Users
+      summary: Create a new user
+      description: Creates a new user and their profile.
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+        '409':
+          description: Email or mobile number already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Get a single user
+      description: Returns a user with their profile.
+
+      parameters:
+        - name: userId
+          in: path
+          description: UUID of the user
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 550e8400-e29b-41d4-a716-446655440000
+
+      responses:
+        '200':
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    patch:
+      tags:
+        - Users
+      summary: Update a user
+      description: Updates user information.
+
+      parameters:
+        - name: userId
+          in: path
+          description: UUID of the user
+          required: true
+          schema:
+            type: string
+            format: uuid
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Users
+      summary: Delete a user
+      description: Deletes a user by UUID.
+
+      parameters:
+        - name: userId
+          in: path
+          description: UUID of the user
+          required: true
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        '200':
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User deleted successfully
+
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+
+        email:
+          type: string
+          format: email
+
+        mobileNumber:
+          type: string
+
+        status:
+          type: string
+          example: ACTIVE
+          enum:
+            - active
+            - inactive
+            - blocked
+
+        authProvider:
+          type: string
+          enum:
+            - email
+            - google
+
+        googleId:
+          type: string
+          nullable: true
+
+        joinedAt:
+          type: string
+          format: date-time
+          example: '2026-08-19T10:00:00.000Z'
+
+        lastLoginAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: '2026-08-19T10:30:00.000Z'
+
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-08-19T10:00:00.000Z'
+
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2026-08-19T10:00:00.000Z'
+
+        profile:
+          $ref: '#/components/schemas/UserProfile'
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 660e8400-e29b-41d4-a716-446655440000
+
+        userId:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+
+        firstName:
+          type: string
+          example: John
+
+        lastName:
+          type: string
+          nullable: true
+          example: Doe
+
+        avatar:
+          type: string
+          nullable: true
+          example: https://example.com/avatar.jpg
+
+        dateOfBirth:
+          type: string
+          format: date
+          nullable: true
+          example: '1995-05-15'
+
+        gender:
+          type: string
+          nullable: true
+          enum:
+            - MALE
+            - FEMALE
+            - OTHER
+          example: MALE
+
+        createdAt:
+          type: string
+          format: date-time
+
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateUserRequest:
+      type: object
+      required:
+        - email
+        - mobileNumber
+        - password
+        - firstName
+
+      properties:
+        email:
+          type: string
+          format: email
+          example: john@example.com
+
+        mobileNumber:
+          type: string
+          example: '9876543210'
+
+        password:
+          type: string
+          format: password
+          example: StrongPassword123!
+
+        firstName:
+          type: string
+          example: John
+
+        lastName:
+          type: string
+          example: Doe
+
+        avatar:
+          type: string
+          nullable: true
+          example: https://example.com/avatar.jpg
+
+        dateOfBirth:
+          type: string
+          format: date
+          nullable: true
+          example: '1995-05-15'
+
+        gender:
+          type: string
+          nullable: true
+          enum:
+            - MALE
+            - FEMALE
+            - OTHER
+          example: MALE
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: john.new@example.com
+
+        mobileNumber:
+          type: string
+          example: '9876543211'
+
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
+            - BLOCKED
+          example: ACTIVE
+
+        firstName:
+          type: string
+          example: John
+
+        lastName:
+          type: string
+          example: Doe
+
+        avatar:
+          type: string
+          nullable: true
+
+        dateOfBirth:
+          type: string
+          format: date
+          nullable: true
+
+        gender:
+          type: string
+          nullable: true
+          enum:
+            - MALE
+            - FEMALE
+            - OTHER
+
+    UserListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+
+        meta:
+          type: object
+          properties:
+            total:
+              type: integer
+              example: 35
+
+            page:
+              type: integer
+              example: 1
+
+            limit:
+              type: integer
+              example: 10
+
+            totalPages:
+              type: integer
+              example: 4
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: User not found
+        statusCode:
+          type: integer
+          example: 404
+        error:
+          type: array
+        path:
+          type: string
+        timestamp:
+          type: string
