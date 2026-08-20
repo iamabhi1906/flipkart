@@ -4,6 +4,7 @@ import {
   type ArgumentsHost,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 
@@ -14,19 +15,31 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+    const isHttpException = exception instanceof HttpException;
 
-    const exceptionResponse =
-      exception instanceof HttpException ? exception.getResponse() : null;
+    const status = isHttpException
+      ? exception.getStatus()
+      : HttpStatus.INTERNAL_SERVER_ERROR;
+
+    if (!isHttpException) {
+      const logger = new Logger(AllExceptionsFilter.name);
+
+      logger.error(
+        `Unhandled server error: ${request.method} ${request.url}`,
+        exception instanceof Error ? exception.stack : exception,
+      );
+    }
+
+    const exceptionResponse = isHttpException ? exception.getResponse() : null;
 
     const errorMessage =
       typeof exceptionResponse === 'object' && exceptionResponse !== null
-        ? (exceptionResponse as any).message ||
+        ? // biome-ignore lint/suspicious/noExplicitAny: <>
+          (exceptionResponse as any).message ||
           JSON.stringify(exceptionResponse)
-        : (exception as Error).message || 'Internal server error';
+        : exception instanceof Error
+          ? exception.message
+          : 'Internal server error';
 
     response.status(status).json({
       success: false,

@@ -40,7 +40,7 @@ export class PasswordService {
     const expiresAt = new Date(Date.now() + this.resetTokenTime * 60 * 1000);
     const reset = this.passwordResetRepository.create({
       userId,
-      token: tokenHash,
+      tokenHash,
       expiresAt,
     });
     await this.passwordResetRepository.save(reset);
@@ -54,7 +54,7 @@ export class PasswordService {
       .digest('hex');
 
     const reset = await this.passwordResetRepository.findOne({
-      where: { token: tokenHash },
+      where: { tokenHash },
     });
 
     if (!reset)
@@ -81,6 +81,8 @@ export class PasswordService {
     newPassword: string,
   ) {
     const user = await this.userService.findOne(userId);
+    if (!user.password)
+      throw new UnauthorizedException('Current password is incorrect');
     const isValid = await this.comparePassword(currentPassword, user.password);
     if (!isValid)
       throw new UnauthorizedException('Current password is incorrect');

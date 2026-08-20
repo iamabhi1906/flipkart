@@ -1,5 +1,3 @@
-import { User } from 'src/modules/users/entities/user.entity';
-
 import {
   Column,
   CreateDateColumn,
@@ -8,17 +6,18 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { User } from '../../users/entities/user.entity';
 
-@Entity('password_reset')
+@Entity('password_resets')
 export class PasswordReset {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
   id!: string;
 
-  @Column()
+  @Column({})
   userId!: string;
 
-  @Column()
-  token!: string;
+  @Column({ length: 255, unique: true })
+  tokenHash!: string;
 
   @Column({ type: 'timestamp' })
   expiresAt!: Date;
@@ -26,15 +25,10 @@ export class PasswordReset {
   @Column({ type: 'timestamp', nullable: true })
   usedAt?: Date;
 
-  @CreateDateColumn()
+  @CreateDateColumn({})
   createdAt!: Date;
 
-  @ManyToOne(() => User, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({
-    name: 'user_id',
-    referencedColumnName: 'id',
-  })
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn({})
   user!: User;
 }

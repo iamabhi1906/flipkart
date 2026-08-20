@@ -31,6 +31,20 @@ export class UsersService {
     return { ...user, profile: userProfile };
   }
 
+  async createPasswordlessUser(email: string) {
+    const user = this.userRepository.create({
+      email,
+    });
+    await this.userRepository.save(user);
+    const firstName = email.split('@')[0];
+    const userProfile = this.userProfileRepository.create({
+      firstName,
+      userId: user.id,
+    });
+    await this.userProfileRepository.save(userProfile);
+    return { ...user, profile: userProfile };
+  }
+
   async findAll(query: FindAllQueryDto) {
     const { page = 1, limit = 10, search, status } = query;
     const skip = (page - 1) * limit;
@@ -84,6 +98,28 @@ export class UsersService {
     const data = await this.userProfileRepository.save(user.profile);
     console.log(data);
     return user;
+  }
+
+  async updateFullProfile(id: string, dto: any) {
+    const user = await this.findOne(id);
+
+    if (dto.email && dto.email !== user.email) {
+      user.email = dto.email;
+    }
+    if (dto.mobileNumber !== undefined) {
+      user.mobileNumber = dto.mobileNumber;
+    }
+    await this.userRepository.save(user);
+
+    if (!user.profile) {
+      user.profile = this.userProfileRepository.create({ userId: user.id });
+    }
+    if (dto.firstName !== undefined) user.profile.firstName = dto.firstName;
+    if (dto.lastName !== undefined) user.profile.lastName = dto.lastName;
+    if (dto.gender !== undefined) user.profile.gender = dto.gender;
+
+    await this.userProfileRepository.save(user.profile);
+    return this.findOne(id);
   }
 
   async update(id: string, data: DeepPartial<User>) {

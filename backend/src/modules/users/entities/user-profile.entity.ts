@@ -7,41 +7,40 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import UserGenderEnum from '../enums/user.gender';
 import { User } from './user.entity';
 
-@Entity('users_profile')
+@Entity('user_profiles')
 export class UserProfile {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
   id!: string;
-
   @Column({ unique: true })
   userId!: string;
 
-  @Column({ nullable: false })
-  firstName!: string;
+  @Column({ length: 100, nullable: true })
+  firstName?: string;
 
-  @Column({ nullable: true })
+  @Column({ length: 100, nullable: true })
   lastName?: string;
+
+  @Column({ length: 500, nullable: true })
+  profilePictureUrl?: string;
 
   @Column({ nullable: true })
   avatar?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'date', nullable: true })
   dateOfBirth?: Date;
 
-  @Column({ nullable: true, type: 'enum', enum: UserGenderEnum })
-  gender?: UserGenderEnum;
+  @Column({ length: 30, nullable: true })
+  gender?: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({})
   createdAt!: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({})
   updatedAt!: Date;
 
-  @OneToOne(() => User, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
+  @OneToOne(() => User, (user) => user.profile, { onDelete: 'CASCADE' })
+  @JoinColumn({})
   user!: User;
 }
