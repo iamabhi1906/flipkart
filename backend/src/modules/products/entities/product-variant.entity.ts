@@ -14,7 +14,7 @@ export class ProductVariant {
   @PrimaryGeneratedColumn()
   id!: string;
 
-  @Column({})
+  @Column({ name: 'product_id' })
   productId!: string;
 
   @Column({ length: 150 })
@@ -26,21 +26,21 @@ export class ProductVariant {
   @Column({ type: 'decimal', precision: 12, scale: 2, nullable: true })
   price?: number;
 
-  @Column({ default: 0 })
+  @Column({ name: 'stock_quantity', default: 0 })
   stockQuantity!: number;
 
   @Column({ type: 'jsonb', nullable: true })
   attributes?: Record<string, any>;
 
-  @CreateDateColumn({})
+  @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
-  @UpdateDateColumn({})
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
   @ManyToOne(() => Product, (product) => product.variants, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({})
+  @JoinColumn({ name: 'product_id' })
   product!: Product;
 }

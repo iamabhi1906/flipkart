@@ -28,12 +28,11 @@ async function bootstrap() {
     }),
   );
   app.enableCors({
-    origin: ['http://localhost:3000'],
+    origin: ['http://localhost:3000','http://localhost:3002'],
     credentials: true,
   });
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   app.useGlobalFilters(new AllExceptionsFilter());
-
   app.use('/public', express.static(join(process.cwd(), 'public')));
   await app.listen(process.env.PORT ?? 3000);
 }

@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { Box, ButtonBase, Popover, Typography, styled } from "@mui/material";
+import {
+  Box,
+  Button,
+  ButtonBase,
+  Popover,
+  Select,
+  Typography,
+  styled,
+} from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { api } from "@/utils/api";
@@ -23,53 +31,6 @@ interface CategoryBarProps {
   parentId?: string;
 }
 
-/* ---------------------------------- */
-/* Styled Components */
-/* ---------------------------------- */
-
-const Bar = styled(Box)({
-  width: "100%",
-  minHeight: 56,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  backgroundColor: "#fff",
-  borderBottom: "1px solid #e0e0e0",
-  position: "relative",
-  zIndex: 1000,
-});
-
-const Container = styled(Box)({
-  width: "1248px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-});
-
-const CategoryButton = styled(ButtonBase)({
-  display: "flex",
-  alignItems: "center",
-  gap: 2,
-  padding: "10px 8px",
-  borderRadius: 4,
-  fontSize: "13px",
-  fontWeight: 500,
-  color: "#212121",
-  whiteSpace: "nowrap",
-
-  "&:hover": {
-    color: "#2874f0",
-    backgroundColor: "#f5f5f5",
-  },
-});
-
-const Dropdown = styled(Box)({
-  minWidth: 220,
-  maxWidth: 300,
-  padding: "8px 0",
-  backgroundColor: "#fff",
-});
-
 const CategoryItem = styled(ButtonBase)({
   width: "100%",
   minHeight: 42,
@@ -90,10 +51,6 @@ const CategoryName = styled(Typography)({
   fontWeight: 400,
 });
 
-/* ---------------------------------- */
-/* Component */
-/* ---------------------------------- */
-
 const CategoryBar = ({ props }: { props: CategoryBarProps }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -105,21 +62,14 @@ const CategoryBar = ({ props }: { props: CategoryBarProps }) => {
     null,
   );
 
-  /* ---------------------------------- */
-  /* Fetch categories */
-  /* ---------------------------------- */
-
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         setLoading(true);
         setError(null);
-
         const response = await api.get("/categories", {
           params: props,
         });
-
-        console.log("Categories API:", response.data);
 
         setCategories(response.data.data.data);
       } catch (error) {
@@ -133,15 +83,9 @@ const CategoryBar = ({ props }: { props: CategoryBarProps }) => {
     fetchCategories();
   }, [props]);
 
-  /* ---------------------------------- */
-  /* Build tree */
-  /* ---------------------------------- */
-
   const categoryTree = useMemo<CategoryNode[]>(() => {
     const map = new Map<string, CategoryNode>();
     const roots: CategoryNode[] = [];
-
-    // Create nodes
     for (const category of categories) {
       map.set(category.id, {
         ...category,
@@ -149,7 +93,6 @@ const CategoryBar = ({ props }: { props: CategoryBarProps }) => {
       });
     }
 
-    // Connect children
     for (const category of categories) {
       const node = map.get(category.id);
 
@@ -167,17 +110,12 @@ const CategoryBar = ({ props }: { props: CategoryBarProps }) => {
       if (parent) {
         parent.children.push(node);
       } else {
-        // Parent wasn't returned by API.
         roots.push(node);
       }
     }
 
     return roots;
   }, [categories]);
-
-  /* ---------------------------------- */
-  /* Open category */
-  /* ---------------------------------- */
 
   const handleCategoryClick = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -187,8 +125,6 @@ const CategoryBar = ({ props }: { props: CategoryBarProps }) => {
 
     if (category.children.length === 0) {
       console.log("Selected category:", category);
-
-      // Navigate here if required
       // router.push(`/category/${category.slug}`);
 
       return;
@@ -198,48 +134,32 @@ const CategoryBar = ({ props }: { props: CategoryBarProps }) => {
     setActiveCategory(category);
   };
 
-  /* ---------------------------------- */
-  /* Close */
-  /* ---------------------------------- */
-
   const handleClose = () => {
     setAnchorEl(null);
     setActiveCategory(null);
   };
 
-  /* ---------------------------------- */
-  /* Loading */
-  /* ---------------------------------- */
-
   if (loading) {
     return (
-      <Bar>
+      <Box>
         <Typography variant="body2">Loading...</Typography>
-      </Bar>
+      </Box>
     );
   }
-
-  /* ---------------------------------- */
-  /* Error */
-  /* ---------------------------------- */
 
   if (error) {
     return (
-      <Bar>
+      <Box>
         <Typography variant="body2">{error}</Typography>
-      </Bar>
+      </Box>
     );
   }
 
-  /* ---------------------------------- */
-  /* Render */
-  /* ---------------------------------- */
-
   return (
-    <Bar>
-      <Container>
+    <Box>
+      <Box>
         {categoryTree.map((category) => (
-          <CategoryButton
+          <Button
             key={category.id}
             onClick={(event) => handleCategoryClick(event, category)}
           >
@@ -252,11 +172,9 @@ const CategoryBar = ({ props }: { props: CategoryBarProps }) => {
                 }}
               />
             )}
-          </CategoryButton>
+          </Button>
         ))}
-      </Container>
-
-      {/* Dropdown */}
+      </Box>
 
       <Popover
         open={Boolean(anchorEl)}
@@ -278,7 +196,7 @@ const CategoryBar = ({ props }: { props: CategoryBarProps }) => {
         }}
       >
         {activeCategory && (
-          <Dropdown>
+          <Select>
             {activeCategory.children.map((child) => (
               <CategoryItem
                 key={child.id}
@@ -295,10 +213,10 @@ const CategoryBar = ({ props }: { props: CategoryBarProps }) => {
                 )}
               </CategoryItem>
             ))}
-          </Dropdown>
+          </Select>
         )}
       </Popover>
-    </Bar>
+    </Box>
   );
 };
 

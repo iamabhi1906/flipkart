@@ -220,4 +220,8 @@ export class AuthService {
       refreshToken: tokens.refreshToken,
     };
   }
+
+  logout(response: Response) {
+    this.cookiesService.clearAuthCookies(response);
+  }
 }

@@ -19,10 +19,10 @@ export class Product {
   @PrimaryGeneratedColumn()
   id!: string;
 
-  @Column({})
+  @Column({ name: 'vendor_id' })
   vendorId!: string;
 
-  @Column({})
+  @Column({ name: 'category_id' })
   categoryId!: string;
 
   @Column({ length: 255 })
@@ -40,60 +40,60 @@ export class Product {
   @Column({ type: 'decimal', precision: 12, scale: 2 })
   price!: number;
 
-  @Column({ type: 'decimal', precision: 12, scale: 2, nullable: true })
+  @Column({ name: 'compare_at_price', type: 'decimal', precision: 12, scale: 2, nullable: true })
   compareAtPrice?: number;
 
-  @Column({ type: 'decimal', precision: 12, scale: 2, nullable: true })
+  @Column({ name: 'cost_price', type: 'decimal', precision: 12, scale: 2, nullable: true })
   costPrice?: number;
 
-  @Column({ default: 0 })
+  @Column({ name: 'stock_quantity', default: 0 })
   stockQuantity!: number;
 
-  @Column({ default: 5 })
+  @Column({ name: 'low_stock_threshold', default: 5 })
   lowStockThreshold!: number;
 
   @Column({
     type: 'enum',
     enum: ProductStatusEnum,
-    default: ProductStatusEnum.DRAFT,
+    default: ProductStatusEnum.ACTIVE,
   })
   status!: ProductStatusEnum;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   weight?: number;
 
-  @Column({ length: 20, nullable: true })
+  @Column({ name: 'weight_unit', length: 20, nullable: true })
   weightUnit?: string;
 
-  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })
+  @Column({ name: 'tax_rate', type: 'decimal', precision: 5, scale: 2, default: 0 })
   taxRate!: number;
 
-  @Column({ default: 0 })
+  @Column({ name: 'total_sold', default: 0 })
   totalSold!: number;
 
-  @Column({ default: 0 })
+  @Column({ name: 'view_count', default: 0 })
   viewCount!: number;
 
-  @CreateDateColumn({})
+  @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
-  @UpdateDateColumn({})
+  @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ name: 'deleted_at', type: 'timestamp', nullable: true })
   deletedAt?: Date;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  @JoinColumn({})
+  @JoinColumn({ name: 'vendor_id' })
   vendor!: User;
 
   @ManyToOne(() => Category, { onDelete: 'RESTRICT' })
-  @JoinColumn({})
+  @JoinColumn({ name: 'category_id' })
   category!: Category;
 
-  @OneToMany(() => ProductImage, (image) => image.product)
+  @OneToMany(() => ProductImage, (image) => image.product, { cascade: true })
   images!: ProductImage[];
 
-  @OneToMany(() => ProductVariant, (variant) => variant.product)
+  @OneToMany(() => ProductVariant, (variant) => variant.product, { cascade: true })
   variants!: ProductVariant[];
 }

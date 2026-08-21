@@ -8,6 +8,11 @@ import {
 } from "./user.action";
 import { userState } from "./user.type";
 
+const extractUser = (payload: any) => {
+  if (!payload) return null;
+  return payload.data || payload.user || payload;
+};
+
 export const userSlice = createSlice({
   name: "auth",
   initialState: {
@@ -24,7 +29,7 @@ export const userSlice = createSlice({
       })
       .addCase(loginThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user || action.payload;
+        state.user = extractUser(action.payload);
       })
       .addCase(loginThunk.rejected, (state, action) => {
         state.loading = false;
@@ -36,17 +41,17 @@ export const userSlice = createSlice({
       })
       .addCase(verifyOtpThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user || action.payload;
+        state.user = extractUser(action.payload);
       })
       .addCase(verifyOtpThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
       .addCase(getUserThunk.fulfilled, (state, action) => {
-        state.user = action.payload;
+        state.user = extractUser(action.payload);
       })
       .addCase(updateUserProfileThunk.fulfilled, (state, action) => {
-        state.user = action.payload;
+        state.user = extractUser(action.payload);
       })
       .addCase(logoutThunk.fulfilled, (state) => {
         state.user = null;

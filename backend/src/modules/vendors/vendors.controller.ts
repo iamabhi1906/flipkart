@@ -3,21 +3,28 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
-  Delete,
+  Req,
 } from '@nestjs/common';
 import { VendorsService } from './vendors.service';
 import { CreateVendorDto } from './dto/create-vendor.dto';
-import { UpdateVendorDto } from './dto/update-vendor.dto';
+import type { AuthenticatedRequest } from '../common/interfaces/auth-request.interface';
 
 @Controller('vendors')
 export class VendorsController {
   constructor(private readonly vendorsService: VendorsService) {}
 
-  @Post()
-  create(@Body() createVendorDto: CreateVendorDto) {
-    return this.vendorsService.create(createVendorDto);
+  @Post('become-vendor')
+  becomeVendor(
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: CreateVendorDto,
+  ) {
+    return this.vendorsService.becomeVendor(req.user.id, dto);
+  }
+
+  @Get('me')
+  getVendorProfile(@Req() req: AuthenticatedRequest) {
+    return this.vendorsService.getVendorProfile(req.user.id);
   }
 
   @Get()
@@ -27,16 +34,6 @@ export class VendorsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.vendorsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateVendorDto: UpdateVendorDto) {
-    return this.vendorsService.update(+id, updateVendorDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.vendorsService.remove(+id);
+    return this.vendorsService.findOne(id);
   }
 }

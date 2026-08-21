@@ -15,10 +15,11 @@ export class Address {
   @PrimaryGeneratedColumn()
   id!: string;
 
-  @Column({})
+  @Column({ name: 'user_id' })
   userId!: string;
 
   @Column({
+    name: 'address_type',
     type: 'enum',
     enum: AddressTypeEnum,
     default: AddressTypeEnum.HOME,
@@ -31,10 +32,10 @@ export class Address {
   @Column({ length: 20 })
   mobileNumber!: string;
 
-  @Column({ length: 255 })
+  @Column({ name: 'address_line_1', length: 255 })
   addressLine1!: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ name: 'address_line_2', length: 255, nullable: true })
   addressLine2?: string;
 
   @Column({ length: 255, nullable: true })
@@ -62,6 +63,6 @@ export class Address {
   updatedAt!: Date;
 
   @ManyToOne(() => User, (user) => user.addresses, { onDelete: 'CASCADE' })
-  @JoinColumn({})
+  @JoinColumn({ name: 'user_id' })
   user!: User;
 }

@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   Res,
 } from '@nestjs/common';
 import type { Response } from 'express';
@@ -11,8 +13,11 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { RequestOtpDto } from './dto/request-otp.dto';
 import { ResendOtpDto } from './dto/resend-otp.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
+import { Public } from '../common/decorators/public.decorator';
 import { AuthService } from './services/auth.service';
+import type { AuthenticatedRequest } from '../common/interfaces/auth-request.interface';
 
+@Public()
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -50,5 +55,19 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     return this.authService.login(body.email, body.password, response);
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  logout(@Res({ passthrough: true }) response: Response) {
+    this.authService.logout(response);
+    return 'Logout successfully';
+  }
+
+  @Get('me')
+  @Public(false)
+  async getCurrentUser(@Req() request: AuthenticatedRequest) {
+    console.log(request.user);
+    return request.user;
   }
 }

@@ -20,7 +20,7 @@ export class CategoryQueryDto {
   search?: string;
 
   @IsOptional()
-  @IsUUID()
+  // @IsUUID()
   parentId?: string;
 
   //   @IsOptional()

@@ -1,6 +1,7 @@
 import { MailerModule } from '@nestjs-modules/mailer';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TokenModule } from '../token/token.module';
 import { UsersModule } from '../users/users.module';
@@ -9,9 +10,11 @@ import { OtpChallenge } from './entities/otp-challenge.entity';
 import { AuthService } from './services/auth.service';
 import { CookieService } from './services/cookie.service';
 import { MailService } from './services/mail.service';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     UsersModule,
     TokenModule,
     TypeOrmModule.forFeature([OtpChallenge]),
@@ -34,7 +37,7 @@ import { MailService } from './services/mail.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, CookieService, MailService],
-  exports: [AuthService, MailService],
+  providers: [AuthService, CookieService, MailService, JwtStrategy],
+  exports: [AuthService, MailService, PassportModule, JwtStrategy],
 })
 export class AuthModule {}

@@ -1,12 +1,12 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
-  Patch,
   Param,
   Delete,
   Query,
+  Put,
+  Patch,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { FindAllQueryDto } from './dto/query-user.dto';
@@ -26,10 +26,16 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserProfileDto) {
     return this.usersService.updateFullProfile(id, updateUserDto);
   }
+
+  @Patch(':id')
+  patchUpdate(@Param('id') id: string, @Body() updateUserDto: UpdateUserProfileDto) {
+    return this.usersService.updateFullProfile(id, updateUserDto);
+  }
+
 
   @Delete(':id')
   remove(@Param('id') id: string) {

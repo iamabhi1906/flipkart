@@ -38,9 +38,9 @@ export class CategoriesService {
         { search: `%${search}%` },
       );
 
-    if (parentId) {
+    if (parentId && parentId !== 'all') {
       qb.andWhere('category.parentId = :parentId', { parentId });
-    } else {
+    } else if (!parentId && parentId !== 'all') {
       qb.andWhere('category.parentId IS NULL');
     }
 
