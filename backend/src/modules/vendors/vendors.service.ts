@@ -5,7 +5,7 @@ import { VendorProfile } from './entities/vendor.entity';
 import { User } from '../users/entities/user.entity';
 import { CreateVendorDto } from './dto/create-vendor.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
-import { UserRoleEnum } from '../common/enums/erd.enums';
+import { UserRoleEnum, UserStatusEnum } from '../common/enums/erd.enums';
 
 @Injectable()
 export class VendorsService {
@@ -30,8 +30,6 @@ export class VendorsService {
     }
 
     await this.vendorRepository.save(vendorProfile);
-
-    // Update user role to VENDOR
     await this.userRepository.update(userId, { role: UserRoleEnum.VENDOR });
 
     const updatedUser = await this.userRepository.findOne({
@@ -47,20 +45,68 @@ export class VendorsService {
   }
 
   async getVendorProfile(userId: string) {
-    const profile = await this.vendorRepository.findOne({ where: { userId } });
+    const profile = await this.vendorRepository.findOne({
+      where: { userId },
+      relations: { user: true },
+    });
     if (!profile) {
       throw new NotFoundException('Vendor profile not found');
     }
     return profile;
   }
 
+  async updateVendorProfile(userId: string, dto: UpdateVendorDto) {
+    let profile = await this.vendorRepository.findOne({ where: { userId } });
+    if (!profile) {
+      profile = this.vendorRepository.create({
+        userId,
+        businessName: dto.businessName || 'Vendor Business',
+        ...dto,
+      });
+    } else {
+      Object.assign(profile, dto);
+    }
+
+    await this.vendorRepository.save(profile);
+
+    return {
+      message: 'Vendor business profile updated successfully!',
+      vendorProfile: profile,
+    };
+  }
+
   async findAll() {
-    return await this.vendorRepository.find({ relations: { user: true } });
+    return await this.vendorRepository.find({
+      relations: { user: true },
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async findOne(id: string) {
-    const profile = await this.vendorRepository.findOne({ where: { id } });
+    const profile = await this.vendorRepository.findOne({
+      where: { id },
+      relations: { user: true },
+    });
     if (!profile) throw new NotFoundException('Vendor profile not found');
     return profile;
+  }
+
+  async updateVendorStatus(vendorId: string, status: UserStatusEnum) {
+    const vendorProfile = await this.vendorRepository.findOne({
+      where: { id: vendorId },
+      relations: { user: true },
+    });
+
+    if (!vendorProfile || !vendorProfile.user) {
+      throw new NotFoundException('Vendor or associated user account not found');
+    }
+
+    await this.userRepository.update(vendorProfile.userId, { status });
+    vendorProfile.user.status = status;
+
+    return {
+      message: `Vendor status updated to ${status} successfully!`,
+      vendorProfile,
+    };
   }
 }

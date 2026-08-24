@@ -48,34 +48,25 @@ export function useProductCrud(
     state.setShowFormModal(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!state.formData.name || !state.formData.categoryId || state.formData.price <= 0) {
-      state.setFeedback({
-        type: "error",
-        msg: "Please fill in Product Name, Category (from backend), and a valid Price.",
-      });
-      return;
-    }
-
+  const handleSubmit = async (validatedValues: any) => {
     state.setSubmitting(true);
     state.setFeedback(null);
 
-    const filteredImages = (state.formData.imageUrls || []).filter(
-      (url: string) => url.trim().length > 0,
+    const filteredImages = (validatedValues.imageUrls || []).filter(
+      (url: string) => url && url.trim().length > 0,
     );
 
     const payload: ProductData = {
-      name: state.formData.name,
-      categoryId: state.formData.categoryId,
-      description: state.formData.description,
-      sku: state.formData.sku || undefined,
-      price: Number(state.formData.price),
-      compareAtPrice: state.formData.compareAtPrice
-        ? Number(state.formData.compareAtPrice)
+      name: validatedValues.name,
+      categoryId: validatedValues.categoryId,
+      description: validatedValues.description,
+      sku: validatedValues.sku || undefined,
+      price: Number(validatedValues.price),
+      compareAtPrice: validatedValues.compareAtPrice
+        ? Number(validatedValues.compareAtPrice)
         : undefined,
-      stockQuantity: Number(state.formData.stockQuantity || 0),
-      status: state.formData.status || "active",
+      stockQuantity: Number(validatedValues.stockQuantity || 0),
+      status: validatedValues.status || "active",
       imageUrls: filteredImages.length > 0 ? filteredImages : undefined,
     };
 
@@ -84,13 +75,13 @@ export function useProductCrud(
         await updateProduct(state.formData.editingId, payload);
         state.setFeedback({
           type: "success",
-          msg: `Product "${state.formData.name}" updated successfully!`,
+          msg: `Product "${validatedValues.name}" updated successfully!`,
         });
       } else {
         await createProduct(payload);
         state.setFeedback({
           type: "success",
-          msg: `New product "${state.formData.name}" added to inventory!`,
+          msg: `New product "${validatedValues.name}" added to inventory!`,
         });
       }
       state.setShowFormModal(false);

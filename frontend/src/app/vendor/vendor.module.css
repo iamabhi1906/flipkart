@@ -244,6 +244,12 @@
   background-color: #ffffff;
 }
 
+.uploadBtn {
+  white-space: nowrap !important;
+  text-transform: none !important;
+  border-color: #2874f0 !important;
+  color: #2874f0 !important;
+}
 
 .resetFiltersBtn {
   margin-left: auto !important;

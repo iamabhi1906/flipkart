@@ -4,16 +4,19 @@ import React from "react";
 import { Box, Typography, Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import StoreIcon from "@mui/icons-material/Store";
 import styles from "../vendor.module.css";
 
 interface VendorHeaderProps {
   onRefresh: () => void;
   onOpenAddForm: () => void;
+  onOpenProfile: () => void;
 }
 
 export default function VendorHeader({
   onRefresh,
   onOpenAddForm,
+  onOpenProfile,
 }: VendorHeaderProps) {
   return (
     <Box className={styles.headerRow}>
@@ -26,6 +29,14 @@ export default function VendorHeader({
         </Typography>
       </Box>
       <Box className={styles.headerActions}>
+        <Button
+          onClick={onOpenProfile}
+          variant="outlined"
+          startIcon={<StoreIcon />}
+          style={{ textTransform: "none", borderColor: "#cbd5e1" }}
+        >
+          Store Settings
+        </Button>
         <Button
           onClick={onRefresh}
           className={styles.refreshBtn}

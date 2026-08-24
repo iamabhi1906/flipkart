@@ -115,27 +115,71 @@ export default function PrimarySearchAppBar() {
             Flipkart
           </Typography>
 
-          {/* Become a Seller Button */}
-          <Button
-            onClick={() => router.push("/become-seller")}
-            startIcon={<StorefrontIcon />}
-            sx={{
-              color: "#ffffff",
-              textTransform: "none",
-              fontWeight: 600,
-              fontSize: "14px",
-              mr: 2,
-              px: 1.5,
-              py: 0.5,
-              borderRadius: "4px",
-              backgroundColor: "rgba(255, 255, 255, 0.12)",
-              "&:hover": {
-                backgroundColor: "rgba(255, 255, 255, 0.22)",
-              },
-            }}
-          >
-            Become a Seller
-          </Button>
+          {/* Dynamic Seller / Admin Hub Button */}
+          {user && user.role === "admin" ? (
+            <Button
+              onClick={() => router.push("/admin/vendors")}
+              startIcon={<StorefrontIcon />}
+              sx={{
+                color: "#ffffff",
+                textTransform: "none",
+                fontWeight: 600,
+                fontSize: "14px",
+                mr: 2,
+                px: 1.5,
+                py: 0.5,
+                borderRadius: "4px",
+                backgroundColor: "rgba(255, 255, 255, 0.12)",
+                "&:hover": {
+                  backgroundColor: "rgba(255, 255, 255, 0.22)",
+                },
+              }}
+            >
+              Admin Panel
+            </Button>
+          ) : user && user.role === "vendor" ? (
+            <Button
+              onClick={() => router.push("/vendor")}
+              startIcon={<StorefrontIcon />}
+              sx={{
+                color: "#ffffff",
+                textTransform: "none",
+                fontWeight: 600,
+                fontSize: "14px",
+                mr: 2,
+                px: 1.5,
+                py: 0.5,
+                borderRadius: "4px",
+                backgroundColor: "rgba(255, 255, 255, 0.12)",
+                "&:hover": {
+                  backgroundColor: "rgba(255, 255, 255, 0.22)",
+                },
+              }}
+            >
+              Seller Hub
+            </Button>
+          ) : (
+            <Button
+              onClick={() => router.push("/become-seller")}
+              startIcon={<StorefrontIcon />}
+              sx={{
+                color: "#ffffff",
+                textTransform: "none",
+                fontWeight: 600,
+                fontSize: "14px",
+                mr: 2,
+                px: 1.5,
+                py: 0.5,
+                borderRadius: "4px",
+                backgroundColor: "rgba(255, 255, 255, 0.12)",
+                "&:hover": {
+                  backgroundColor: "rgba(255, 255, 255, 0.22)",
+                },
+              }}
+            >
+              Become a Seller
+            </Button>
+          )}
 
           <Box sx={{ display: "flex", alignItems: "center" }}>
             {user ? (

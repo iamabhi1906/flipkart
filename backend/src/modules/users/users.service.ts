@@ -96,7 +96,6 @@ export class UsersService {
     const user = await this.findOne(id);
     user.profile = { ...user.profile, ...updateUserDto };
     const data = await this.userProfileRepository.save(user.profile);
-    console.log(data);
     return user;
   }
 

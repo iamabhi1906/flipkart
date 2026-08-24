@@ -1,10 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Box, Alert } from "@mui/material";
 
 import PrimarySearchAppBar from "@/components/appbar";
-import CategoryBar from "@/components/category";
 import { useVendorProducts } from "./hooks/use-vendor-products";
 
 import VendorHeader from "./components/vendor-header";
@@ -14,10 +13,13 @@ import VendorProductTable from "./components/vendor-product-table";
 import ProductFormModal from "./components/product-form-modal";
 import ProductPreviewModal from "./components/product-preview-modal";
 import DeleteConfirmModal from "./components/delete-confirm-modal";
+import VendorProfileModal from "./components/vendor-profile-modal";
 
 import styles from "./vendor.module.css";
 
 export default function VendorProductsPage() {
+  const [showProfileModal, setShowProfileModal] = useState(false);
+
   const {
     products,
     filteredProducts,
@@ -73,12 +75,12 @@ export default function VendorProductsPage() {
   return (
     <Box className={styles.container}>
       <PrimarySearchAppBar />
-      {/* <CategoryBar props={{ page: 1, limit: 9 }} /> */}
 
       <Box className={styles.mainWrapper}>
         <VendorHeader
           onRefresh={loadVendorProducts}
           onOpenAddForm={handleOpenAddForm}
+          onOpenProfile={() => setShowProfileModal(true)}
         />
 
         {feedback && (
@@ -141,9 +143,8 @@ export default function VendorProductsPage() {
       <ProductFormModal
         open={showFormModal}
         onClose={() => setShowFormModal(false)}
-        onSubmit={handleSubmit}
+        onSubmitProduct={handleSubmit}
         formData={formData}
-        setFormData={setFormData}
         categories={categories}
         submitting={submitting}
         onCategorySearchInputChange={setCategorySearchInput}
@@ -161,6 +162,11 @@ export default function VendorProductsPage() {
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleConfirmDelete}
         product={selectedProduct}
+      />
+
+      <VendorProfileModal
+        open={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
       />
     </Box>
   );

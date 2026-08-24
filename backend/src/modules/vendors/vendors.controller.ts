@@ -2,12 +2,15 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Body,
   Param,
   Req,
 } from '@nestjs/common';
 import { VendorsService } from './vendors.service';
 import { CreateVendorDto } from './dto/create-vendor.dto';
+import { UpdateVendorDto } from './dto/update-vendor.dto';
+import { UpdateVendorStatusDto } from './dto/update-vendor-status.dto';
 import type { AuthenticatedRequest } from '../common/interfaces/auth-request.interface';
 
 @Controller('vendors')
@@ -27,6 +30,14 @@ export class VendorsController {
     return this.vendorsService.getVendorProfile(req.user.id);
   }
 
+  @Patch('me')
+  updateVendorProfile(
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: UpdateVendorDto,
+  ) {
+    return this.vendorsService.updateVendorProfile(req.user.id, dto);
+  }
+
   @Get()
   findAll() {
     return this.vendorsService.findAll();
@@ -35,5 +46,13 @@ export class VendorsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.vendorsService.findOne(id);
+  }
+
+  @Patch(':id/status')
+  updateStatus(
+    @Param('id') id: string,
+    @Body() dto: UpdateVendorStatusDto,
+  ) {
+    return this.vendorsService.updateVendorStatus(id, dto.status);
   }
 }

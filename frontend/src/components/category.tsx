@@ -124,7 +124,6 @@ const CategoryBar = ({ props }: { props: CategoryBarProps }) => {
     event.stopPropagation();
 
     if (category.children.length === 0) {
-      console.log("Selected category:", category);
       // router.push(`/category/${category.slug}`);
 
       return;

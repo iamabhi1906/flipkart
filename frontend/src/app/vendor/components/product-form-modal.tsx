@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -12,7 +12,13 @@ import {
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { ProductData } from "@/services/product.service";
+import {
+  productFormSchema,
+  ProductFormValues,
+} from "../schemas/product-form-schema";
 import ProductFormFields from "./product-form-fields";
 import ProductFormImages from "./product-form-images";
 import styles from "../vendor.module.css";
@@ -20,11 +26,8 @@ import styles from "../vendor.module.css";
 interface ProductFormModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmitProduct: (values: ProductFormValues) => void;
   formData: ProductData & { editingId?: string };
-  setFormData: React.Dispatch<
-    React.SetStateAction<ProductData & { editingId?: string }>
-  >;
   categories: any[];
   submitting: boolean;
   onCategorySearchInputChange?: (val: string) => void;
@@ -34,33 +37,59 @@ interface ProductFormModalProps {
 export default function ProductFormModal({
   open,
   onClose,
-  onSubmit,
+  onSubmitProduct,
   formData,
-  setFormData,
   categories,
   submitting,
   onCategorySearchInputChange,
   loadingCategories,
 }: ProductFormModalProps) {
+  const { control, handleSubmit, reset, watch, setValue } =
+    useForm<ProductFormValues>({
+      resolver: zodResolver(productFormSchema),
+      defaultValues: {
+        name: "",
+        description: "",
+        categoryId: "",
+        price: 0,
+        compareAtPrice: 0,
+        stockQuantity: 0,
+        sku: "",
+        status: "active",
+        imageUrls: [""],
+      },
+    });
+
+  useEffect(() => {
+    if (!open) return;
+    reset({
+      name: formData.name || "",
+      description: formData.description || "",
+      categoryId: formData.categoryId || "",
+      price: Number(formData.price || 0),
+      compareAtPrice: Number(formData.compareAtPrice || 0),
+      stockQuantity: Number(formData.stockQuantity || 0),
+      sku: formData.sku || "",
+      status: formData.status === "draft" ? "draft" : "active",
+      imageUrls: formData.imageUrls && formData.imageUrls.length > 0 ? formData.imageUrls : [""],
+    });
+  }, [open, formData, reset]);
+
+  const imageUrls = watch("imageUrls") || [""];
+
   const handleAddImageUrl = () => {
-    setFormData((prev) => ({
-      ...prev,
-      imageUrls: [...(prev.imageUrls || []), ""],
-    }));
+    setValue("imageUrls", [...imageUrls, ""]);
   };
 
-  const handleImageUrlChange = (index: number, value: string) => {
-    const updated = [...(formData.imageUrls || [])];
-    updated[index] = value;
-    setFormData((prev) => ({ ...prev, imageUrls: updated }));
+  const handleImageUrlChange = (index: number, val: string) => {
+    const updated = [...imageUrls];
+    updated[index] = val;
+    setValue("imageUrls", updated);
   };
 
   const handleRemoveImageUrl = (index: number) => {
-    const updated = (formData.imageUrls || []).filter((_, i) => i !== index);
-    setFormData((prev) => ({
-      ...prev,
-      imageUrls: updated.length > 0 ? updated : [""],
-    }));
+    const updated = imageUrls.filter((_, i) => i !== index);
+    setValue("imageUrls", updated.length > 0 ? updated : [""]);
   };
 
   return (
@@ -82,18 +111,17 @@ export default function ProductFormModal({
         </Box>
       </DialogTitle>
 
-      <form onSubmit={onSubmit}>
+      <form onSubmit={handleSubmit(onSubmitProduct)}>
         <DialogContent dividers>
           <Box className={styles.formCardGrid}>
             <ProductFormFields
-              formData={formData}
-              setFormData={setFormData}
+              control={control}
               categories={categories}
               onCategorySearchInputChange={onCategorySearchInputChange}
               loadingCategories={loadingCategories}
             />
             <ProductFormImages
-              imageUrls={formData.imageUrls || [""]}
+              imageUrls={imageUrls}
               onAddImageUrl={handleAddImageUrl}
               onImageUrlChange={handleImageUrlChange}
               onRemoveImageUrl={handleRemoveImageUrl}
