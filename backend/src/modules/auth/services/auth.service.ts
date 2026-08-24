@@ -9,7 +9,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'node:crypto';
-import type { Response } from 'express';
+import type { Response, Request } from 'express';
 import { Repository } from 'typeorm';
 import { TokenService } from '../../token/token.service';
 import UserStatusEnum from '../../users/enums/user.status';
@@ -223,5 +223,18 @@ export class AuthService {
 
   logout(response: Response) {
     this.cookiesService.clearAuthCookies(response);
+  }
+
+  async refresh(request: Request, response: Response) {
+    const payload = await this.tokenService.verifyRefreshToken(
+      request?.cookies?.refresh_token,
+    );
+    const accessToken = await this.tokenService.generateAccessToken({
+      sub: payload.sub,
+      email: payload.email,
+      role: payload.role,
+    });
+    await this.cookiesService.setAccessToken(response, accessToken);
+    return { accessToken };
   }
 }

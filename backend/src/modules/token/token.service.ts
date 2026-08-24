@@ -16,7 +16,9 @@ export class TokenService {
       JwtSignOptions['expiresIn']
     >('JWT_ACCESS_EXPIRES_IN');
 
-    return this.jwtService.signAsync(payload, {
+    const { exp, iat, nbf, ...cleanPayload } = payload as any;
+
+    return this.jwtService.signAsync(cleanPayload, {
       secret: this.configService.getOrThrow<string>('JWT_SECRET'),
       expiresIn: accessExpiresIn,
     });
@@ -26,7 +28,10 @@ export class TokenService {
     const refreshExpiresIn = this.configService.getOrThrow<
       JwtSignOptions['expiresIn']
     >('JWT_REFRESH_EXPIRES_IN');
-    return this.jwtService.signAsync(payload, {
+
+    const { exp, iat, nbf, ...cleanPayload } = payload as any;
+
+    return this.jwtService.signAsync(cleanPayload, {
       secret: this.configService.getOrThrow<string>('JWT_SECRET'),
       expiresIn: refreshExpiresIn,
     });

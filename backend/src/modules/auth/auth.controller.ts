@@ -8,7 +8,7 @@ import {
   Req,
   Res,
 } from '@nestjs/common';
-import type { Response } from 'express';
+import type { Response, Request } from 'express';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { RequestOtpDto } from './dto/request-otp.dto';
 import { ResendOtpDto } from './dto/resend-otp.dto';
@@ -64,10 +64,18 @@ export class AuthController {
     return 'Logout successfully';
   }
 
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  async refresh(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    await this.authService.refresh(request, response);
+  }
+
   @Get('me')
   @Public(false)
   async getCurrentUser(@Req() request: AuthenticatedRequest) {
-    console.log(request.user);
     return request.user;
   }
 }
