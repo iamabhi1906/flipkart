@@ -2,16 +2,20 @@
 
 import React from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogActions,
   Box,
   Typography,
   Chip,
+  Button,
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import LaunchIcon from "@mui/icons-material/Launch";
 import { ProductData } from "@/services/product.service";
 import styles from "../vendor.module.css";
 
@@ -26,6 +30,8 @@ export default function ProductPreviewModal({
   onClose,
   product,
 }: ProductPreviewModalProps) {
+  const router = useRouter();
+
   if (!product) return null;
 
   const primaryImg =
@@ -35,7 +41,7 @@ export default function ProductPreviewModal({
       ? product.imageUrls[0]
       : "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400";
 
-  const stock = Number(product.stockQuantity || 0);
+  const stock = Number(product.effectiveStockQuantity ?? product.stockQuantity ?? 0);
 
   return (
     <Dialog
@@ -108,6 +114,23 @@ export default function ProductPreviewModal({
           </Box>
         </Box>
       </DialogContent>
+
+      <DialogActions>
+        <Button onClick={onClose} color="inherit">
+          CLOSE
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<LaunchIcon />}
+          onClick={() => {
+            onClose();
+            router.push(`/products/${product.id}`);
+          }}
+        >
+          VIEW LIVE PRODUCT PAGE
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }

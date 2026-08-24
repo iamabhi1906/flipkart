@@ -12,7 +12,11 @@ interface PdpSpecsProps {
 export default function PdpSpecs({ product }: PdpSpecsProps) {
   return (
     <Box className={styles.specsCard}>
-      <Typography variant="h6" style={{ fontWeight: 800, marginBottom: 12 }}>
+      <Typography
+        variant="h6"
+        style={{ fontWeight: 800, marginBottom: 12 }}
+        color="secondary"
+      >
         Product Specifications & Description
       </Typography>
       <Divider style={{ marginBottom: 16 }} />

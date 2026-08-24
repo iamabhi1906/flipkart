@@ -4,6 +4,7 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
+  createProductVariant,
   ProductData,
 } from "@/services/product.service";
 import { INITIAL_PRODUCT_FORM } from "./use-vendor-state";
@@ -44,6 +45,7 @@ export function useProductCrud(
       stockQuantity: prod.stockQuantity ?? 10,
       status: prod.status || "active",
       imageUrls: existingImages.length > 0 ? existingImages : [""],
+      variants: prod.variants || [],
     });
     state.setShowFormModal(true);
   };
@@ -71,19 +73,35 @@ export function useProductCrud(
     };
 
     try {
+      let savedProduct: ProductData;
       if (state.formData.editingId) {
-        await updateProduct(state.formData.editingId, payload);
-        state.setFeedback({
-          type: "success",
-          msg: `Product "${validatedValues.name}" updated successfully!`,
-        });
+        savedProduct = await updateProduct(state.formData.editingId, payload);
       } else {
-        await createProduct(payload);
-        state.setFeedback({
-          type: "success",
-          msg: `New product "${validatedValues.name}" added to inventory!`,
-        });
+        savedProduct = await createProduct(payload);
       }
+
+      if (
+        savedProduct?.id &&
+        validatedValues.variants &&
+        validatedValues.variants.length > 0
+      ) {
+        for (const variant of validatedValues.variants) {
+          if (!variant.id && variant.name) {
+            await createProductVariant(savedProduct.id, {
+              name: variant.name,
+              sku: variant.sku,
+              price: variant.price ? Number(variant.price) : undefined,
+              stockQuantity: Number(variant.stockQuantity || 0),
+              attributes: variant.attributes || {},
+            });
+          }
+        }
+      }
+
+      state.setFeedback({
+        type: "success",
+        msg: `Product "${validatedValues.name}" saved successfully!`,
+      });
       state.setShowFormModal(false);
       state.setFormData(INITIAL_PRODUCT_FORM);
       reloadProducts();

@@ -21,6 +21,7 @@ import {
 } from "../schemas/product-form-schema";
 import ProductFormFields from "./product-form-fields";
 import ProductFormImages from "./product-form-images";
+import ProductFormVariants from "./product-form-variants";
 import styles from "../vendor.module.css";
 
 interface ProductFormModalProps {
@@ -57,6 +58,7 @@ export default function ProductFormModal({
         sku: "",
         status: "active",
         imageUrls: [""],
+        variants: [],
       },
     });
 
@@ -72,10 +74,21 @@ export default function ProductFormModal({
       sku: formData.sku || "",
       status: formData.status === "draft" ? "draft" : "active",
       imageUrls: formData.imageUrls && formData.imageUrls.length > 0 ? formData.imageUrls : [""],
+      variants: formData.variants
+        ? formData.variants.map((v) => ({
+            id: v.id,
+            name: v.name,
+            sku: v.sku,
+            price: v.price ? Number(v.price) : undefined,
+            stockQuantity: Number(v.stockQuantity || 0),
+            attributes: v.attributes || {},
+          }))
+        : [],
     });
   }, [open, formData, reset]);
 
   const imageUrls = watch("imageUrls") || [""];
+  const variants = watch("variants") || [];
 
   const handleAddImageUrl = () => {
     setValue("imageUrls", [...imageUrls, ""]);
@@ -90,6 +103,23 @@ export default function ProductFormModal({
   const handleRemoveImageUrl = (index: number) => {
     const updated = imageUrls.filter((_, i) => i !== index);
     setValue("imageUrls", updated.length > 0 ? updated : [""]);
+  };
+
+  const handleAddVariant = () => {
+    setValue("variants", [
+      ...variants,
+      { name: "", stockQuantity: 10, price: undefined, attributes: {} },
+    ]);
+  };
+
+  const handleUpdateVariant = (idx: number, field: string, val: any) => {
+    const updated = [...variants];
+    updated[idx] = { ...updated[idx], [field]: val };
+    setValue("variants", updated);
+  };
+
+  const handleRemoveVariant = (idx: number) => {
+    setValue("variants", variants.filter((_, i) => i !== idx));
   };
 
   return (
@@ -125,6 +155,12 @@ export default function ProductFormModal({
               onAddImageUrl={handleAddImageUrl}
               onImageUrlChange={handleImageUrlChange}
               onRemoveImageUrl={handleRemoveImageUrl}
+            />
+            <ProductFormVariants
+              variants={variants}
+              onAddVariant={handleAddVariant}
+              onUpdateVariant={handleUpdateVariant}
+              onRemoveVariant={handleRemoveVariant}
             />
           </Box>
         </DialogContent>

@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Box, Typography, Button, Chip } from "@mui/material";
 import TimerIcon from "@mui/icons-material/Timer";
 import StarIcon from "@mui/icons-material/Star";
@@ -17,6 +18,7 @@ export default function HomeFlashDeals({
   products,
   timeLeft,
 }: HomeFlashDealsProps) {
+  const router = useRouter();
   const pad = (num: number) => String(num).padStart(2, "0");
 
   const fallbackDeals: ProductData[] = [
@@ -79,7 +81,9 @@ export default function HomeFlashDeals({
             className={styles.timerChip}
           />
         </Box>
-        <Button className={styles.viewAllBtn}>VIEW ALL</Button>
+        <Button className={styles.viewAllBtn} onClick={() => router.push("/products")}>
+          VIEW ALL
+        </Button>
       </Box>
 
       <Box className={styles.productGrid}>
@@ -101,7 +105,12 @@ export default function HomeFlashDeals({
               : 50;
 
           return (
-            <Box key={prod.id} className={styles.productCard}>
+            <Box
+              key={prod.id}
+              className={styles.productCard}
+              onClick={() => router.push(`/products/${prod.id}`)}
+              style={{ cursor: "pointer" }}
+            >
               <Box className={styles.discountBadge}>{discount}% OFF</Box>
 
               <Box className={styles.productImageWrapper}>
@@ -142,7 +151,15 @@ export default function HomeFlashDeals({
                 </Typography>
               </Box>
 
-              <Button className={styles.addToCartBtn}>ADD TO CART</Button>
+              <Button
+                className={styles.addToCartBtn}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/products/${prod.id}`);
+                }}
+              >
+                VIEW DETAILS
+              </Button>
             </Box>
           );
         })}

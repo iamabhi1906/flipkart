@@ -1,5 +1,17 @@
 import { z } from "zod";
 
+export const productVariantSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(1, "Variant name is required"),
+  sku: z.string().optional(),
+  price: z.number().optional(),
+  stockQuantity: z.number().int().min(0, "Stock quantity cannot be negative"),
+  attributes: z.object({
+    color: z.string().optional(),
+    size: z.string().optional(),
+  }).optional(),
+});
+
 export const productFormSchema = z.object({
   name: z.string().min(2, "Product name must be at least 2 characters"),
   description: z.string().optional(),
@@ -10,6 +22,8 @@ export const productFormSchema = z.object({
   sku: z.string().optional(),
   status: z.enum(["active", "draft"]),
   imageUrls: z.array(z.string()),
+  variants: z.array(productVariantSchema).optional(),
 });
 
+export type ProductVariantFormValues = z.infer<typeof productVariantSchema>;
 export type ProductFormValues = z.infer<typeof productFormSchema>;

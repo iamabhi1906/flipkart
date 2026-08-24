@@ -2,7 +2,9 @@
   min-height: 100vh;
   background-color: #f1f5f9;
   padding-bottom: 48px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  padding-top: 48px;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .pdpMain {
@@ -94,7 +96,7 @@
 .productTitle {
   font-size: 22px !important;
   font-weight: 700 !important;
-  color: #0f172a;
+  color: #0f172a !important;
   line-height: 1.3 !important;
 }
 
@@ -171,7 +173,7 @@
 
 .buyBtn {
   background-color: #fb641b !important;
-  color: #ffffff !important;
+  /* color: #ffffff !important; */
   font-weight: 700 !important;
   padding: 12px 28px !important;
   border-radius: 6px !important;
@@ -181,7 +183,6 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: #f8fafc;
   padding: 12px;
   border-radius: 8px;
   border: 1px solid #e2e8f0;

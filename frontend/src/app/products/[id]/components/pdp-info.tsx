@@ -40,9 +40,7 @@ export default function PdpInfo({
         {product.category?.name || "General Catalog"}
       </Typography>
 
-      <Typography className={styles.productTitle}>
-        {product.name}
-      </Typography>
+      <Typography className={styles.productTitle}>{product.name}</Typography>
 
       <Box className={styles.priceRow}>
         <Typography className={styles.priceText}>
@@ -105,7 +103,7 @@ export default function PdpInfo({
 
       <Box className={styles.sellerBadge}>
         <VerifiedIcon style={{ color: "#2874f0", fontSize: 20 }} />
-        <Typography variant="body2" style={{ fontWeight: 600 }}>
+        <Typography variant="body2" style={{ fontWeight: 600 }} color="primary">
           Sold by: {vendorName}
         </Typography>
       </Box>
