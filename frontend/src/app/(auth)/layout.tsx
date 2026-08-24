@@ -13,7 +13,7 @@ export default function AuthLayout({
     <html lang="en" className={roboto.variable}>
       <body>
         {/* <PrimarySearchAppBar /> */}
-        <CategoryBar props={{ page: 1, limit: 9 }} />
+        {/* <CategoryBar props={{ page: 1, limit: 9 }} /> */}
         <main>{children}</main>
         <Footer />
       </body>

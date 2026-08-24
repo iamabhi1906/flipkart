@@ -18,7 +18,7 @@ import { OrderItem } from './order-item.entity';
 
 @Entity('orders')
 export class Order {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Column({ length: 50, unique: true })
@@ -71,10 +71,10 @@ export class Order {
   @Column({ length: 20 })
   shippingMobileNumber!: string;
 
-  @Column({ length: 255 })
+  @Column({ name: 'shipping_address_line_1', length: 255 })
   shippingAddressLine1!: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ name: 'shipping_address_line_2', length: 255, nullable: true })
   shippingAddressLine2?: string;
 
   @Column({ length: 255, nullable: true })

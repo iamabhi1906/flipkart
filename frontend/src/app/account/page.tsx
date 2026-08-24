@@ -29,6 +29,7 @@ import {
   deleteAddressThunk,
 } from "@/features/addresses/address.action";
 import { AddressData } from "@/services/address.service";
+import CustomerOrders from "./components/customer-orders";
 import styles from "./account.module.css";
 
 const INITIAL_ADDRESS_FORM: AddressData & { editingId?: string } = {
@@ -65,7 +66,7 @@ export default function AccountPage() {
 
   // Main navigation tab
   const [activeTab, setActiveTab] = useState<
-    "profile" | "addresses" | "pancard"
+    "profile" | "addresses" | "pancard" | "orders"
   >("profile");
 
   // Profile Form states
@@ -355,7 +356,7 @@ export default function AccountPage() {
   return (
     <Box className={styles.container}>
       <PrimarySearchAppBar />
-      <CategoryBar props={{ page: 1, limit: 9 }} />
+      {/* <CategoryBar props={{ page: 1, limit: 9 }} /> */}
 
       <Box className={styles.mainWrapper}>
         {/* Left Sidebar */}
@@ -383,8 +384,8 @@ export default function AccountPage() {
             {/* MY ORDERS */}
             <Box className={styles.menuSection}>
               <Box
-                className={styles.menuHeader}
-                onClick={() => router.push("/orders")}
+                className={`${styles.menuHeader} ${activeTab === "orders" ? styles.menuItemActive : ""}`}
+                onClick={() => setActiveTab("orders")}
               >
                 <Box className={styles.menuHeaderLeft}>
                   <ShoppingBagIcon sx={{ color: "#2874f0" }} />
@@ -480,6 +481,8 @@ export default function AccountPage() {
               {feedback.msg}
             </Alert>
           )}
+
+          {activeTab === "orders" && <CustomerOrders />}
 
           {activeTab === "profile" && (
             <Box>

@@ -2,41 +2,65 @@ import {
   Controller,
   Get,
   Post,
-  Body,
   Patch,
+  Body,
   Param,
-  Delete,
+  Req,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
+import { CheckoutDto } from './dto/checkout.dto';
+import { UpdateOrderItemStatusDto } from './dto/update-order-item-status.dto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
+import type { AuthenticatedRequest } from '../common/interfaces/auth-request.interface';
 
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
-  @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
+  @Post('checkout')
+  checkout(@Req() req: AuthenticatedRequest, @Body() dto: CheckoutDto) {
+    return this.ordersService.checkout(req.user.id, dto);
   }
 
-  @Get()
-  findAll() {
-    return this.ordersService.findAll();
+  @Get('my-orders')
+  findMyOrders(@Req() req: AuthenticatedRequest) {
+    return this.ordersService.findMyOrders(req.user.id);
+  }
+
+  @Get('vendor/items')
+  findVendorOrderItems(@Req() req: AuthenticatedRequest) {
+    return this.ordersService.findVendorOrderItems(req.user.id);
+  }
+
+  @Patch('vendor/items/:itemId/status')
+  updateVendorOrderItemStatus(
+    @Param('itemId') itemId: string,
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: UpdateOrderItemStatusDto,
+  ) {
+    return this.ordersService.updateVendorOrderItemStatus(req.user.id, itemId, dto.status);
+  }
+
+  @Get('admin/all')
+  findAllOrdersForAdmin() {
+    return this.ordersService.findAllOrdersForAdmin();
+  }
+
+  @Patch('admin/:id/status')
+  updateOrderStatusByAdmin(
+    @Param('id') id: string,
+    @Body() dto: UpdateOrderStatusDto,
+  ) {
+    return this.ordersService.updateOrderStatusByAdmin(id, dto.status);
+  }
+
+  @Post(':id/cancel')
+  cancelOrder(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
+    return this.ordersService.cancelOrder(req.user.id, id);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ordersService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.ordersService.update(+id, updateOrderDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ordersService.remove(+id);
+  findOne(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
+    return this.ordersService.findOne(id, req.user.id);
   }
 }

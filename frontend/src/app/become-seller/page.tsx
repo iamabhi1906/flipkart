@@ -120,7 +120,7 @@ export default function BecomeSellerPage() {
   return (
     <Box className={styles.container}>
       <PrimarySearchAppBar />
-      <CategoryBar props={{ page: 1, limit: 9 }} />
+      {/* <CategoryBar props={{ page: 1, limit: 9 }} /> */}
 
       {/* Hero Banner Header */}
       <Box className={styles.heroBanner}>
