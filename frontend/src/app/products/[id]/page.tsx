@@ -7,6 +7,7 @@ import PrimarySearchAppBar from "@/components/appbar";
 import PdpGallery from "./components/pdp-gallery";
 import PdpInfo from "./components/pdp-info";
 import PdpSpecs from "./components/pdp-specs";
+import PdpReviews from "./components/pdp-reviews";
 import { useProductDetail } from "./hooks/use-product-detail";
 import styles from "./pdp.module.css";
 
@@ -55,6 +56,7 @@ export default function ProductDetailPage() {
               />
             </Box>
             <PdpSpecs product={product} />
+            <PdpReviews productId={product.id || productId} />
           </>
         )}
       </Box>

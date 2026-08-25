@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Box, CircularProgress } from "@mui/material";
+import { Box, Button, CircularProgress } from "@mui/material";
 import PrimarySearchAppBar from "@/components/appbar";
 import AdminVendorHeader from "./components/admin-vendor-header";
 import AdminVendorTable from "./components/admin-vendor-table";
@@ -25,6 +25,8 @@ export default function AdminVendorsPage() {
       <PrimarySearchAppBar />
 
       <Box className={styles.adminMain}>
+        <Button href="/admin/banners">Banner management</Button>
+
         <AdminVendorHeader
           vendors={vendors}
           searchTerm={searchTerm}

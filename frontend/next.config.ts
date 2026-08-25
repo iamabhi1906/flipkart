@@ -5,9 +5,19 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'static-assets-web.flixcart.com',
-        pathname: '/**', // Allows all paths under this domain
+        protocol: "https",
+        hostname: "static-assets-web.flixcart.com",
+        pathname: "/**", // Allows all paths under this domain
+      },
+      {
+        protocol: "https",
+        hostname: "rukminim1.flixcart.com",
+        pathname: "/**", // Allows all paths under this domain
+      },
+       {
+        protocol: "https",
+        hostname: "rukminim2.flixcart.com",
+        pathname: "/**", // Allows all paths under this domain
       },
     ],
   },

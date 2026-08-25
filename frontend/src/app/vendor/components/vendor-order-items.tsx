@@ -26,7 +26,10 @@ import {
 } from "@/services/order.service";
 import styles from "../vendor.module.css";
 
-const STATUS_COLORS: Record<string, "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"> = {
+const STATUS_COLORS: Record<
+  string,
+  "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"
+> = {
   pending: "warning",
   confirmed: "info",
   processing: "primary",
@@ -72,10 +75,20 @@ export default function VendorOrderItems() {
 
   return (
     <Box style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <Box style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <Box
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <Box style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <LocalShippingIcon style={{ color: "#2874f0" }} />
-          <Typography variant="h6" style={{ fontWeight: 700 }}>
+          <Typography
+            variant="h6"
+            style={{ fontWeight: 700 }}
+            color="textPrimary"
+          >
             Vendor Order Fulfillment Hub ({items.length} items)
           </Typography>
         </Box>
@@ -93,23 +106,31 @@ export default function VendorOrderItems() {
       ) : items.length === 0 ? (
         <Alert severity="info">No orders assigned to your store yet.</Alert>
       ) : (
-        <TableContainer component={Paper} style={{ borderRadius: 8, border: "1px solid #e2e8f0" }}>
+        <TableContainer
+          component={Paper}
+          style={{ borderRadius: 8, border: "1px solid #e2e8f0" }}
+        >
           <Table size="small">
             <TableHead style={{ backgroundColor: "#f8fafc" }}>
               <TableRow>
                 <TableCell style={{ fontWeight: 700 }}>Order #</TableCell>
-                <TableCell style={{ fontWeight: 700 }}>Product / Variant</TableCell>
+                <TableCell style={{ fontWeight: 700 }}>
+                  Product / Variant
+                </TableCell>
                 <TableCell style={{ fontWeight: 700 }}>Qty</TableCell>
                 <TableCell style={{ fontWeight: 700 }}>Unit Price</TableCell>
                 <TableCell style={{ fontWeight: 700 }}>Total</TableCell>
-                <TableCell style={{ fontWeight: 700 }}>Shipping Dest.</TableCell>
+                <TableCell style={{ fontWeight: 700 }}>
+                  Shipping Dest.
+                </TableCell>
                 <TableCell style={{ fontWeight: 700 }}>Status</TableCell>
                 <TableCell style={{ fontWeight: 700 }}>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {items.map((item) => {
-                const orderNum = item.order?.orderNumber || item.orderId?.slice(0, 8);
+                const orderNum =
+                  item.order?.orderNumber || item.orderId?.slice(0, 8);
                 const isUpdating = updatingId === item.id;
 
                 return (
@@ -122,20 +143,31 @@ export default function VendorOrderItems() {
                         {item.productName}
                       </Typography>
                       {item.sku && (
-                        <Typography variant="caption" style={{ color: "#64748b" }}>
+                        <Typography
+                          variant="caption"
+                          style={{ color: "#64748b" }}
+                        >
                           SKU: {item.sku}
                         </Typography>
                       )}
                     </TableCell>
-                    <TableCell style={{ fontWeight: 700 }}>{item.quantity}</TableCell>
-                    <TableCell>₹{Number(item.unitPrice).toLocaleString("en-IN")}</TableCell>
+                    <TableCell style={{ fontWeight: 700 }}>
+                      {item.quantity}
+                    </TableCell>
+                    <TableCell>
+                      ₹{Number(item.unitPrice).toLocaleString("en-IN")}
+                    </TableCell>
                     <TableCell style={{ fontWeight: 800 }}>
                       ₹{Number(item.totalAmount).toLocaleString("en-IN")}
                     </TableCell>
                     <TableCell>
                       {item.order ? (
-                        <Typography variant="caption" style={{ color: "#475569" }}>
-                          {item.order.shippingCity}, {item.order.shippingState} ({item.order.shippingPostalCode})
+                        <Typography
+                          variant="caption"
+                          style={{ color: "#475569" }}
+                        >
+                          {item.order.shippingCity}, {item.order.shippingState}{" "}
+                          ({item.order.shippingPostalCode})
                         </Typography>
                       ) : (
                         "-"
@@ -153,7 +185,9 @@ export default function VendorOrderItems() {
                       <Select
                         size="small"
                         value={item.status || "pending"}
-                        onChange={(e) => handleStatusChange(item.id, e.target.value)}
+                        onChange={(e) =>
+                          handleStatusChange(item.id, e.target.value)
+                        }
                         disabled={isUpdating || item.status === "cancelled"}
                         style={{ fontSize: 13, height: 32 }}
                       >

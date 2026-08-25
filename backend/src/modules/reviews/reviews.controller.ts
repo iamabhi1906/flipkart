@@ -6,37 +6,51 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
+import { Public } from '../common/decorators/public.decorator';
+import type { AuthenticatedRequest } from '../common/interfaces/auth-request.interface';
 
 @Controller('reviews')
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
   @Post()
-  create(@Body() createReviewDto: CreateReviewDto) {
-    return this.reviewsService.create(createReviewDto);
+  create(
+    @Req() req: AuthenticatedRequest,
+    @Body() createReviewDto: CreateReviewDto,
+  ) {
+    return this.reviewsService.create(req.user.id, createReviewDto);
   }
 
-  @Get()
-  findAll() {
-    return this.reviewsService.findAll();
+  @Public()
+  @Get('product/:productId')
+  findByProduct(@Param('productId') productId: string) {
+    return this.reviewsService.findByProduct(productId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.reviewsService.findOne(+id);
+  @Get('order-item/:orderItemId')
+  findByOrderItem(
+    @Req() req: AuthenticatedRequest,
+    @Param('orderItemId') orderItemId: string,
+  ) {
+    return this.reviewsService.findByOrderItem(req.user.id, orderItemId);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto) {
-    return this.reviewsService.update(+id, updateReviewDto);
+  update(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() updateReviewDto: UpdateReviewDto,
+  ) {
+    return this.reviewsService.update(req.user.id, id, updateReviewDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.reviewsService.remove(+id);
+  remove(@Req() req: AuthenticatedRequest, @Param('id') id: string) {
+    return this.reviewsService.remove(req.user.id, id);
   }
 }

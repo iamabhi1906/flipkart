@@ -22,6 +22,7 @@ import { TrackingModule } from './modules/tracking/tracking.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { EarningsModule } from './modules/earnings/earnings.module';
+import { BannersModule } from './modules/banners/banners.module';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { TransformInterceptor } from './modules/common/interceptors/transform.interceptor';
 import { JwtAuthGuard } from './modules/common/guards/jwt-auth.guard';
@@ -52,6 +53,7 @@ import { JwtAuthGuard } from './modules/common/guards/jwt-auth.guard';
     ReviewsModule,
     NotificationsModule,
     EarningsModule,
+    BannersModule,
   ],
   controllers: [AppController],
   providers: [
