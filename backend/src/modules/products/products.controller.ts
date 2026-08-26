@@ -35,7 +35,10 @@ export class ProductsController {
     if (!file) {
       throw new BadRequestException('Image file is required');
     }
-    const result = await this.storageService.uploadFile(file, 'flipkart_products');
+    const result = await this.storageService.uploadFile(
+      file,
+      'flipkart_products',
+    );
     return {
       success: true,
       url: result.url,
@@ -97,7 +100,12 @@ export class ProductsController {
     @Req() req: AuthenticatedRequest,
     @Body() dto: UpdateProductVariantDto,
   ) {
-    return this.productsService.updateVariant(productId, variantId, req.user.id, dto);
+    return this.productsService.updateVariant(
+      productId,
+      variantId,
+      req.user.id,
+      dto,
+    );
   }
 
   @Delete(':productId/variants/:variantId')
@@ -106,6 +114,10 @@ export class ProductsController {
     @Param('variantId') variantId: string,
     @Req() req: AuthenticatedRequest,
   ) {
-    return this.productsService.deleteVariant(productId, variantId, req.user.id);
+    return this.productsService.deleteVariant(
+      productId,
+      variantId,
+      req.user.id,
+    );
   }
 }

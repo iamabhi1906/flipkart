@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Body,
-  Param,
-  Req,
-} from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Req } from '@nestjs/common';
 import { VendorsService } from './vendors.service';
 import { CreateVendorDto } from './dto/create-vendor.dto';
 import { UpdateVendorDto } from './dto/update-vendor.dto';
@@ -18,10 +10,7 @@ export class VendorsController {
   constructor(private readonly vendorsService: VendorsService) {}
 
   @Post('become-vendor')
-  becomeVendor(
-    @Req() req: AuthenticatedRequest,
-    @Body() dto: CreateVendorDto,
-  ) {
+  becomeVendor(@Req() req: AuthenticatedRequest, @Body() dto: CreateVendorDto) {
     return this.vendorsService.becomeVendor(req.user.id, dto);
   }
 
@@ -49,10 +38,7 @@ export class VendorsController {
   }
 
   @Patch(':id/status')
-  updateStatus(
-    @Param('id') id: string,
-    @Body() dto: UpdateVendorStatusDto,
-  ) {
+  updateStatus(@Param('id') id: string, @Body() dto: UpdateVendorStatusDto) {
     return this.vendorsService.updateVendorStatus(id, dto.status);
   }
 }

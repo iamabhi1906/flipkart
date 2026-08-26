@@ -72,9 +72,18 @@ export class AddUserRelationships1724000006000 implements MigrationInterface {
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropForeignKey('notifications', 'FK_NOTIFICATIONS_USER');
     await queryRunner.dropForeignKey('addresses', 'FK_ADDRESSES_USER');
-    await queryRunner.dropForeignKey('admin_profiles', 'FK_ADMIN_PROFILES_USER');
-    await queryRunner.dropForeignKey('vendor_profiles', 'FK_VENDOR_PROFILES_USER');
+    await queryRunner.dropForeignKey(
+      'admin_profiles',
+      'FK_ADMIN_PROFILES_USER',
+    );
+    await queryRunner.dropForeignKey(
+      'vendor_profiles',
+      'FK_VENDOR_PROFILES_USER',
+    );
     await queryRunner.dropForeignKey('user_profiles', 'FK_USER_PROFILES_USER');
-    await queryRunner.dropForeignKey('password_resets', 'FK_PASSWORD_RESETS_USER');
+    await queryRunner.dropForeignKey(
+      'password_resets',
+      'FK_PASSWORD_RESETS_USER',
+    );
   }
 }

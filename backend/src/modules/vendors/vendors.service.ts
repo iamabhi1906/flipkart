@@ -17,7 +17,9 @@ export class VendorsService {
   ) {}
 
   async becomeVendor(userId: string, dto: CreateVendorDto) {
-    let vendorProfile = await this.vendorRepository.findOne({ where: { userId } });
+    let vendorProfile = await this.vendorRepository.findOne({
+      where: { userId },
+    });
 
     if (vendorProfile) {
       Object.assign(vendorProfile, dto);
@@ -98,7 +100,9 @@ export class VendorsService {
     });
 
     if (!vendorProfile || !vendorProfile.user) {
-      throw new NotFoundException('Vendor or associated user account not found');
+      throw new NotFoundException(
+        'Vendor or associated user account not found',
+      );
     }
 
     await this.userRepository.update(vendorProfile.userId, { status });

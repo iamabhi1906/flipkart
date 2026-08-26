@@ -1,4 +1,10 @@
-import { IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { AddressTypeEnum } from '../../common/enums/erd.enums';
 
 export class CreateAddressDto {

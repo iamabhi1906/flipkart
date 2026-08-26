@@ -4,7 +4,13 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, ILike, Between, MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
+import {
+  Repository,
+  ILike,
+  Between,
+  MoreThanOrEqual,
+  LessThanOrEqual,
+} from 'typeorm';
 import { Product } from './entities/product.entity';
 import { ProductImage } from './entities/product-image.entity';
 import { ProductVariant } from './entities/product-variant.entity';
@@ -37,7 +43,10 @@ export class ProductsService {
 
   private calculateEffectiveStock(product: Product): number {
     if (product.variants && product.variants.length > 0) {
-      return product.variants.reduce((sum, v) => sum + Number(v.stockQuantity || 0), 0);
+      return product.variants.reduce(
+        (sum, v) => sum + Number(v.stockQuantity || 0),
+        0,
+      );
     }
     return Number(product.stockQuantity || 0);
   }
@@ -152,7 +161,9 @@ export class ProductsService {
       throw new NotFoundException(`Product with ID/slug "${id}" not found`);
     }
 
-    this.productRepository.increment({ id: product.id }, 'viewCount', 1).catch(() => {});
+    this.productRepository
+      .increment({ id: product.id }, 'viewCount', 1)
+      .catch(() => {});
 
     return {
       ...product,
@@ -187,7 +198,9 @@ export class ProductsService {
     }
 
     if (product.vendorId !== vendorId) {
-      throw new ForbiddenException(`You do not have permission to update this product`);
+      throw new ForbiddenException(
+        `You do not have permission to update this product`,
+      );
     }
 
     Object.assign(product, dto);
@@ -217,34 +230,55 @@ export class ProductsService {
     }
 
     if (product.vendorId !== vendorId) {
-      throw new ForbiddenException(`You do not have permission to delete this product`);
+      throw new ForbiddenException(
+        `You do not have permission to delete this product`,
+      );
     }
 
     await this.productRepository.remove(product);
     return { message: 'Product deleted successfully' };
   }
 
-  async createVariant(productId: string, vendorId: string, dto: CreateProductVariantDto) {
-    const product = await this.productRepository.findOne({ where: { id: productId } });
+  async createVariant(
+    productId: string,
+    vendorId: string,
+    dto: CreateProductVariantDto,
+  ) {
+    const product = await this.productRepository.findOne({
+      where: { id: productId },
+    });
     if (!product) throw new NotFoundException('Product not found');
-    if (product.vendorId !== vendorId) throw new ForbiddenException('Access denied');
+    if (product.vendorId !== vendorId)
+      throw new ForbiddenException('Access denied');
 
     const variant = this.productVariantRepository.create({
       ...dto,
       productId,
-      sku: dto.sku || `${product.sku}-VAR-${Date.now().toString(36).toUpperCase()}`,
+      sku:
+        dto.sku ||
+        `${product.sku}-VAR-${Date.now().toString(36).toUpperCase()}`,
     });
 
     await this.productVariantRepository.save(variant);
     return this.findOne(productId);
   }
 
-  async updateVariant(productId: string, variantId: string, vendorId: string, dto: UpdateProductVariantDto) {
-    const product = await this.productRepository.findOne({ where: { id: productId } });
+  async updateVariant(
+    productId: string,
+    variantId: string,
+    vendorId: string,
+    dto: UpdateProductVariantDto,
+  ) {
+    const product = await this.productRepository.findOne({
+      where: { id: productId },
+    });
     if (!product) throw new NotFoundException('Product not found');
-    if (product.vendorId !== vendorId) throw new ForbiddenException('Access denied');
+    if (product.vendorId !== vendorId)
+      throw new ForbiddenException('Access denied');
 
-    const variant = await this.productVariantRepository.findOne({ where: { id: variantId, productId } });
+    const variant = await this.productVariantRepository.findOne({
+      where: { id: variantId, productId },
+    });
     if (!variant) throw new NotFoundException('Variant not found');
 
     Object.assign(variant, dto);
@@ -253,11 +287,16 @@ export class ProductsService {
   }
 
   async deleteVariant(productId: string, variantId: string, vendorId: string) {
-    const product = await this.productRepository.findOne({ where: { id: productId } });
+    const product = await this.productRepository.findOne({
+      where: { id: productId },
+    });
     if (!product) throw new NotFoundException('Product not found');
-    if (product.vendorId !== vendorId) throw new ForbiddenException('Access denied');
+    if (product.vendorId !== vendorId)
+      throw new ForbiddenException('Access denied');
 
-    const variant = await this.productVariantRepository.findOne({ where: { id: variantId, productId } });
+    const variant = await this.productVariantRepository.findOne({
+      where: { id: variantId, productId },
+    });
     if (!variant) throw new NotFoundException('Variant not found');
 
     await this.productVariantRepository.remove(variant);

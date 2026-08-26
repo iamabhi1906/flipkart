@@ -40,10 +40,22 @@ export class Product {
   @Column({ type: 'decimal', precision: 12, scale: 2 })
   price!: number;
 
-  @Column({ name: 'compare_at_price', type: 'decimal', precision: 12, scale: 2, nullable: true })
+  @Column({
+    name: 'compare_at_price',
+    type: 'decimal',
+    precision: 12,
+    scale: 2,
+    nullable: true,
+  })
   compareAtPrice?: number;
 
-  @Column({ name: 'cost_price', type: 'decimal', precision: 12, scale: 2, nullable: true })
+  @Column({
+    name: 'cost_price',
+    type: 'decimal',
+    precision: 12,
+    scale: 2,
+    nullable: true,
+  })
   costPrice?: number;
 
   @Column({ name: 'stock_quantity', default: 0 })
@@ -65,7 +77,13 @@ export class Product {
   @Column({ name: 'weight_unit', length: 20, nullable: true })
   weightUnit?: string;
 
-  @Column({ name: 'tax_rate', type: 'decimal', precision: 5, scale: 2, default: 0 })
+  @Column({
+    name: 'tax_rate',
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    default: 0,
+  })
   taxRate!: number;
 
   @Column({ name: 'total_sold', default: 0 })
@@ -94,6 +112,8 @@ export class Product {
   @OneToMany(() => ProductImage, (image) => image.product, { cascade: true })
   images!: ProductImage[];
 
-  @OneToMany(() => ProductVariant, (variant) => variant.product, { cascade: true })
+  @OneToMany(() => ProductVariant, (variant) => variant.product, {
+    cascade: true,
+  })
   variants!: ProductVariant[];
 }

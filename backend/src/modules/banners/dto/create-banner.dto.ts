@@ -1,4 +1,11 @@
-import { IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString, IsUrl } from 'class-validator';
+import {
+  IsBoolean,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+} from 'class-validator';
 
 export class CreateBannerDto {
   @IsOptional()

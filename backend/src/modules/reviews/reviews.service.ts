@@ -8,7 +8,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProductReview } from './entities/product-review.entity';
 import { OrderItem } from '../orders/entities/order-item.entity';
-import { OrderItemStatusEnum, OrderStatusEnum } from '../common/enums/erd.enums';
+import {
+  OrderItemStatusEnum,
+  OrderStatusEnum,
+} from '../common/enums/erd.enums';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 
@@ -21,7 +24,10 @@ export class ReviewsService {
     private readonly orderItemRepository: Repository<OrderItem>,
   ) {}
 
-  async create(userId: string, createReviewDto: CreateReviewDto): Promise<ProductReview> {
+  async create(
+    userId: string,
+    createReviewDto: CreateReviewDto,
+  ): Promise<ProductReview> {
     const { orderItemId, productId, rating, title, comment } = createReviewDto;
 
     // 1. Verify OrderItem existence and ownership
@@ -31,15 +37,21 @@ export class ReviewsService {
     });
 
     if (!orderItem) {
-      throw new NotFoundException(`Order item with ID "${orderItemId}" not found`);
+      throw new NotFoundException(
+        `Order item with ID "${orderItemId}" not found`,
+      );
     }
 
     if (orderItem.order.customerId !== userId) {
-      throw new ForbiddenException('You can only review items from your own orders.');
+      throw new ForbiddenException(
+        'You can only review items from your own orders.',
+      );
     }
 
     if (orderItem.productId !== productId) {
-      throw new BadRequestException('Order item does not match the specified product.');
+      throw new BadRequestException(
+        'Order item does not match the specified product.',
+      );
     }
 
     // 2. Strict Delivery Status Check: Order or OrderItem MUST be DELIVERED
@@ -91,11 +103,19 @@ export class ReviewsService {
     const avgRating =
       totalReviews > 0
         ? Number(
-            (reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews).toFixed(1),
+            (
+              reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews
+            ).toFixed(1),
           )
         : 0;
 
-    const ratingCounts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    const ratingCounts: Record<number, number> = {
+      1: 0,
+      2: 0,
+      3: 0,
+      4: 0,
+      5: 0,
+    };
     reviews.forEach((r) => {
       if (ratingCounts[r.rating] !== undefined) {
         ratingCounts[r.rating]++;
@@ -133,13 +153,20 @@ export class ReviewsService {
     };
   }
 
-  async findByOrderItem(userId: string, orderItemId: string): Promise<ProductReview | null> {
+  async findByOrderItem(
+    userId: string,
+    orderItemId: string,
+  ): Promise<ProductReview | null> {
     return this.reviewRepository.findOne({
       where: { userId, orderItemId },
     });
   }
 
-  async update(userId: string, id: string, updateReviewDto: UpdateReviewDto): Promise<ProductReview> {
+  async update(
+    userId: string,
+    id: string,
+    updateReviewDto: UpdateReviewDto,
+  ): Promise<ProductReview> {
     const review = await this.reviewRepository.findOne({ where: { id } });
     if (!review) {
       throw new NotFoundException(`Review with ID "${id}" not found`);

@@ -3,7 +3,10 @@ import * as bcrypt from 'bcrypt';
 import { User } from '../../modules/users/entities/user.entity';
 import { UserProfile } from '../../modules/users/entities/user-profile.entity';
 import { AdminProfile } from '../../modules/admins/entities/admin.entity';
-import { UserRoleEnum, UserStatusEnum } from '../../modules/common/enums/erd.enums';
+import {
+  UserRoleEnum,
+  UserStatusEnum,
+} from '../../modules/common/enums/erd.enums';
 
 async function seedAdmin() {
   console.log('Initializing DataSource for Admin seeding...');
@@ -19,7 +22,9 @@ async function seedAdmin() {
   let user = await userRepository.findOne({ where: { email: targetEmail } });
 
   if (user) {
-    console.log(`User with email ${targetEmail} exists. Updating to ADMIN role...`);
+    console.log(
+      `User with email ${targetEmail} exists. Updating to ADMIN role...`,
+    );
     user.role = UserRoleEnum.ADMIN;
     user.status = UserStatusEnum.ACTIVE;
     await userRepository.save(user);
@@ -42,7 +47,9 @@ async function seedAdmin() {
     await userProfileRepository.save(profile);
   }
 
-  let adminProfile = await adminProfileRepository.findOne({ where: { userId: user.id } });
+  let adminProfile = await adminProfileRepository.findOne({
+    where: { userId: user.id },
+  });
   if (!adminProfile) {
     adminProfile = adminProfileRepository.create({ userId: user.id });
     await adminProfileRepository.save(adminProfile);

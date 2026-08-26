@@ -37,8 +37,17 @@ export class AddCouponOrderRelationship1724000016000 implements MigrationInterfa
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropForeignKey('coupon_user_usage', 'FK_COUPON_USAGE_ORDER');
-    await queryRunner.dropForeignKey('coupon_user_usage', 'FK_COUPON_USAGE_USER');
-    await queryRunner.dropForeignKey('coupon_user_usage', 'FK_COUPON_USAGE_COUPON');
+    await queryRunner.dropForeignKey(
+      'coupon_user_usage',
+      'FK_COUPON_USAGE_ORDER',
+    );
+    await queryRunner.dropForeignKey(
+      'coupon_user_usage',
+      'FK_COUPON_USAGE_USER',
+    );
+    await queryRunner.dropForeignKey(
+      'coupon_user_usage',
+      'FK_COUPON_USAGE_COUPON',
+    );
   }
 }

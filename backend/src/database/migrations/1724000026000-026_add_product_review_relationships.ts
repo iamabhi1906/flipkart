@@ -37,8 +37,17 @@ export class AddProductReviewRelationships1724000026000 implements MigrationInte
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropForeignKey('product_reviews', 'FK_PRODUCT_REVIEWS_ORDER_ITEM');
-    await queryRunner.dropForeignKey('product_reviews', 'FK_PRODUCT_REVIEWS_USER');
-    await queryRunner.dropForeignKey('product_reviews', 'FK_PRODUCT_REVIEWS_PRODUCT');
+    await queryRunner.dropForeignKey(
+      'product_reviews',
+      'FK_PRODUCT_REVIEWS_ORDER_ITEM',
+    );
+    await queryRunner.dropForeignKey(
+      'product_reviews',
+      'FK_PRODUCT_REVIEWS_USER',
+    );
+    await queryRunner.dropForeignKey(
+      'product_reviews',
+      'FK_PRODUCT_REVIEWS_PRODUCT',
+    );
   }
 }

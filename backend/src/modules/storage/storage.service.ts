@@ -1,5 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
-import type { IStorageProvider, StorageUploadResult } from './storage.interface';
+import type {
+  IStorageProvider,
+  StorageUploadResult,
+} from './storage.interface';
 import { STORAGE_PROVIDER } from './storage.interface';
 
 @Injectable()

@@ -37,8 +37,17 @@ export class AddVendorEarningsRelationships1724000024000 implements MigrationInt
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropForeignKey('vendor_earnings', 'FK_VENDOR_EARNINGS_ORDER_ITEM');
-    await queryRunner.dropForeignKey('vendor_earnings', 'FK_VENDOR_EARNINGS_ORDER');
-    await queryRunner.dropForeignKey('vendor_earnings', 'FK_VENDOR_EARNINGS_VENDOR');
+    await queryRunner.dropForeignKey(
+      'vendor_earnings',
+      'FK_VENDOR_EARNINGS_ORDER_ITEM',
+    );
+    await queryRunner.dropForeignKey(
+      'vendor_earnings',
+      'FK_VENDOR_EARNINGS_ORDER',
+    );
+    await queryRunner.dropForeignKey(
+      'vendor_earnings',
+      'FK_VENDOR_EARNINGS_VENDOR',
+    );
   }
 }

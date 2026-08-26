@@ -32,10 +32,12 @@ export class UsersController {
   }
 
   @Patch(':id')
-  patchUpdate(@Param('id') id: string, @Body() updateUserDto: UpdateUserProfileDto) {
+  patchUpdate(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserProfileDto,
+  ) {
     return this.usersService.updateFullProfile(id, updateUserDto);
   }
-
 
   @Delete(':id')
   remove(@Param('id') id: string) {

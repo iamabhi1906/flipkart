@@ -26,7 +26,13 @@ export class AddOrderTrackingRelationships1724000018000 implements MigrationInte
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropForeignKey('order_tracking', 'FK_ORDER_TRACKING_ORDER_ITEM');
-    await queryRunner.dropForeignKey('order_tracking', 'FK_ORDER_TRACKING_ORDER');
+    await queryRunner.dropForeignKey(
+      'order_tracking',
+      'FK_ORDER_TRACKING_ORDER_ITEM',
+    );
+    await queryRunner.dropForeignKey(
+      'order_tracking',
+      'FK_ORDER_TRACKING_ORDER',
+    );
   }
 }

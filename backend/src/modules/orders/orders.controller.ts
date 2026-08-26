@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Body,
-  Param,
-  Req,
-} from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Req } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CheckoutDto } from './dto/checkout.dto';
 import { UpdateOrderItemStatusDto } from './dto/update-order-item-status.dto';
@@ -38,7 +30,11 @@ export class OrdersController {
     @Req() req: AuthenticatedRequest,
     @Body() dto: UpdateOrderItemStatusDto,
   ) {
-    return this.ordersService.updateVendorOrderItemStatus(req.user.id, itemId, dto.status);
+    return this.ordersService.updateVendorOrderItemStatus(
+      req.user.id,
+      itemId,
+      dto.status,
+    );
   }
 
   @Get('admin/all')

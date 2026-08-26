@@ -45,6 +45,9 @@ export class AddOrderCancellationRelationships1724000020000 implements Migration
       'order_cancellations',
       'FK_ORDER_CANCELLATIONS_ORDER_ITEM',
     );
-    await queryRunner.dropForeignKey('order_cancellations', 'FK_ORDER_CANCELLATIONS_ORDER');
+    await queryRunner.dropForeignKey(
+      'order_cancellations',
+      'FK_ORDER_CANCELLATIONS_ORDER',
+    );
   }
 }

@@ -48,8 +48,14 @@ export class AddProductRelationships1724000010000 implements MigrationInterface 
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropForeignKey('product_variants', 'FK_PRODUCT_VARIANTS_PRODUCT');
-    await queryRunner.dropForeignKey('product_images', 'FK_PRODUCT_IMAGES_PRODUCT');
+    await queryRunner.dropForeignKey(
+      'product_variants',
+      'FK_PRODUCT_VARIANTS_PRODUCT',
+    );
+    await queryRunner.dropForeignKey(
+      'product_images',
+      'FK_PRODUCT_IMAGES_PRODUCT',
+    );
     await queryRunner.dropForeignKey('products', 'FK_PRODUCTS_CATEGORY');
     await queryRunner.dropForeignKey('products', 'FK_PRODUCTS_VENDOR');
   }
