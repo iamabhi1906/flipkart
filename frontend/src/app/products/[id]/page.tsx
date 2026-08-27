@@ -46,6 +46,7 @@ export default function ProductDetailPage() {
                 product={product}
                 selectedImage={selectedImage}
                 onSelectImage={setSelectedImage}
+                selectedVariant={selectedVariant}
               />
               <PdpInfo
                 product={product}

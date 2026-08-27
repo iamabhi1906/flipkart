@@ -19,7 +19,7 @@ import { ResendOtpDto } from '../dto/resend-otp.dto';
 import { VerifyOtpDto } from '../dto/verify-otp.dto';
 import { OtpChallenge } from '../entities/otp-challenge.entity';
 import { CookieService } from './cookie.service';
-import { MailService } from './mail.service';
+import { MailService } from '../../mail/mail.service';
 import { CreateUserDto } from '../../users/dto/create-user.dto';
 
 const OTP_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes

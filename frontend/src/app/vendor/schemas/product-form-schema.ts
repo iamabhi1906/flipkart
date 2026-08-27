@@ -6,10 +6,9 @@ export const productVariantSchema = z.object({
   sku: z.string().optional(),
   price: z.number().optional(),
   stockQuantity: z.number().int().min(0, "Stock quantity cannot be negative"),
-  attributes: z.object({
-    color: z.string().optional(),
-    size: z.string().optional(),
-  }).optional(),
+  thumbnail: z.string().optional(),
+  images: z.array(z.string()).optional(),
+  attributes: z.record(z.string(), z.string()).optional(),
 });
 
 export const productFormSchema = z.object({

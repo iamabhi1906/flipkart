@@ -1,0 +1,49 @@
+.dialogContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 12px;
+}
+
+.attrRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.variantCard {
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid var(--mui-palette-divider, #e2e8f0);
+  background-color: var(--mui-palette-background-default, #f8fafc);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.variantCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.variantTitle {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.attrChipGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.attributeBadge {
+  display: inline-flex;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  background-color: var(--mui-palette-action-selected, #e2e8f0);
+  color: var(--mui-palette-text-primary, #1e293b);
+}

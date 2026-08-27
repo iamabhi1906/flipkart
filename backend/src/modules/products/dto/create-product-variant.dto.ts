@@ -29,4 +29,11 @@ export class CreateProductVariantDto {
   @IsOptional()
   @IsObject()
   attributes?: Record<string, any>;
+
+  @IsOptional()
+  images?: string[];
+
+  @IsOptional()
+  @IsString()
+  thumbnail?: string;
 }

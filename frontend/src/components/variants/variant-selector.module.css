@@ -1,0 +1,56 @@
+.selectorWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.variantMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 16px;
+  background-color: var(--mui-palette-action-hover, #f8fafc);
+  border-radius: 8px;
+  border: 1px solid var(--mui-palette-divider, #e2e8f0);
+}
+
+.variantName {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--mui-palette-text-primary, #0f172a);
+}
+
+.priceContainer {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.currentPrice {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--mui-palette-primary-main, #2874f0);
+}
+
+.stockBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.inStock {
+  color: var(--mui-palette-success-main, #16a34a);
+}
+
+.outOfStock {
+  color: var(--mui-palette-error-main, #dc2626);
+}
+
+.attributesList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

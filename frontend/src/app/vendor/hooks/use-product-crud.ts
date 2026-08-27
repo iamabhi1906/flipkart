@@ -5,6 +5,7 @@ import {
   updateProduct,
   deleteProduct,
   createProductVariant,
+  updateProductVariant,
   ProductData,
 } from "@/services/product.service";
 import { INITIAL_PRODUCT_FORM } from "./use-vendor-state";
@@ -15,9 +16,7 @@ export function useProductCrud(
   reloadCategories?: () => void,
 ) {
   const handleOpenAddForm = async () => {
-    if (reloadCategories) {
-      await reloadCategories();
-    }
+    if (reloadCategories) await reloadCategories();
     state.setFormData({
       ...INITIAL_PRODUCT_FORM,
       categoryId: state.categories.length > 0 ? state.categories[0].id : "",
@@ -26,13 +25,11 @@ export function useProductCrud(
   };
 
   const handleEditProduct = async (prod: ProductData) => {
-    if (reloadCategories) {
-      await reloadCategories();
-    }
+    if (reloadCategories) await reloadCategories();
     const existingImages =
       prod.images && prod.images.length > 0
         ? prod.images.map((img: any) => img.imageUrl || img)
-        : prod.imageUrls || [""];
+        : prod.imageUrls || [];
 
     state.setFormData({
       editingId: prod.id,
@@ -44,7 +41,7 @@ export function useProductCrud(
       compareAtPrice: prod.compareAtPrice ? Number(prod.compareAtPrice) : 0,
       stockQuantity: prod.stockQuantity ?? 10,
       status: prod.status || "active",
-      imageUrls: existingImages.length > 0 ? existingImages : [""],
+      imageUrls: existingImages,
       variants: prod.variants || [],
     });
     state.setShowFormModal(true);
@@ -53,10 +50,7 @@ export function useProductCrud(
   const handleSubmit = async (validatedValues: any) => {
     state.setSubmitting(true);
     state.setFeedback(null);
-
-    const filteredImages = (validatedValues.imageUrls || []).filter(
-      (url: string) => url && url.trim().length > 0,
-    );
+    const filteredImages = (validatedValues.imageUrls || []).filter((u: string) => u?.trim());
 
     const payload: ProductData = {
       name: validatedValues.name,
@@ -80,20 +74,22 @@ export function useProductCrud(
         savedProduct = await createProduct(payload);
       }
 
-      if (
-        savedProduct?.id &&
-        validatedValues.variants &&
-        validatedValues.variants.length > 0
-      ) {
-        for (const variant of validatedValues.variants) {
-          if (!variant.id && variant.name) {
-            await createProductVariant(savedProduct.id, {
-              name: variant.name,
-              sku: variant.sku,
-              price: variant.price ? Number(variant.price) : undefined,
-              stockQuantity: Number(variant.stockQuantity || 0),
-              attributes: variant.attributes || {},
-            });
+      if (savedProduct?.id && validatedValues.variants?.length > 0) {
+        for (const v of validatedValues.variants) {
+          const varPayload = {
+            name: v.name,
+            sku: v.sku,
+            price: v.price ? Number(v.price) : undefined,
+            stockQuantity: Number(v.stockQuantity || 0),
+            attributes: v.attributes || {},
+            images: v.images || [],
+            thumbnail: v.thumbnail || (v.images && v.images[0]) || "",
+          };
+
+          if (v.id) {
+            await updateProductVariant(savedProduct.id, v.id, varPayload);
+          } else if (v.name) {
+            await createProductVariant(savedProduct.id, varPayload);
           }
         }
       }
@@ -120,7 +116,6 @@ export function useProductCrud(
     const currentStock = Number(prod.stockQuantity || 0);
     const newStock = Math.max(0, currentStock + delta);
     if (newStock === currentStock) return;
-
     try {
       await updateProduct(prod.id, { stockQuantity: newStock });
       state.setProducts((prev: any[]) =>
@@ -131,10 +126,7 @@ export function useProductCrud(
     }
   };
 
-  const handleQuickStatusChange = async (
-    prod: ProductData,
-    newStatus: "active" | "draft",
-  ) => {
+  const handleQuickStatusChange = async (prod: ProductData, newStatus: "active" | "draft") => {
     if (!prod.id) return;
     try {
       await updateProduct(prod.id, { status: newStatus });
@@ -155,10 +147,7 @@ export function useProductCrud(
     state.setFeedback(null);
     try {
       await deleteProduct(state.deletingId);
-      state.setFeedback({
-        type: "success",
-        msg: "Product deleted from inventory successfully!",
-      });
+      state.setFeedback({ type: "success", msg: "Product deleted successfully!" });
       state.setShowDeleteModal(false);
       state.setDeletingId(null);
       state.setSelectedProduct(null);

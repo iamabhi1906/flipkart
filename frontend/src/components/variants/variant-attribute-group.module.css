@@ -1,0 +1,32 @@
+.groupContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.attributeTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--mui-palette-text-primary, #1e293b);
+  text-transform: capitalize;
+}
+
+.selectedValue {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--mui-palette-text-secondary, #64748b);
+}
+
+.chipsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}

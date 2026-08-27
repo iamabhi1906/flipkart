@@ -14,6 +14,7 @@ import { Product } from '../products/entities/product.entity';
 import { ProductVariant } from '../products/entities/product-variant.entity';
 import { Address } from '../addresses/entities/address.entity';
 import { CheckoutDto } from './dto/checkout.dto';
+import { MailService } from '../mail/mail.service';
 import {
   OrderStatusEnum,
   PaymentStatusEnum,
@@ -29,6 +30,7 @@ export class OrdersService {
     private readonly orderRepository: Repository<Order>,
     @InjectRepository(OrderItem)
     private readonly orderItemRepository: Repository<OrderItem>,
+    private readonly mailService: MailService,
   ) {}
 
   async checkout(userId: string, dto: CheckoutDto) {
@@ -241,20 +243,105 @@ export class OrdersService {
     vendorId: string,
     itemId: string,
     status: OrderItemStatusEnum,
+    otp?: string,
   ) {
     const item = await this.orderItemRepository.findOne({
       where: { id: itemId, vendorId },
-      relations: { order: true },
+      relations: { order: { customer: { profile: true } } },
     });
     if (!item) throw new NotFoundException('Order item not found for vendor');
 
+    if (status === OrderItemStatusEnum.OUT_FOR_DELIVERY) {
+      const generatedOtp = Math.floor(
+        100000 + Math.random() * 900000,
+      ).toString();
+      item.deliveryOtp = generatedOtp;
+      item.status = status;
+      await this.orderItemRepository.save(item);
+
+      if (item.order?.customer?.email) {
+        const profileName = item.order.customer.profile?.firstName
+          ? `${item.order.customer.profile.firstName} ${item.order.customer.profile.lastName || ''}`.trim()
+          : null;
+        const customerName =
+          profileName || item.order.shippingFullName || 'Valued Customer';
+        await this.mailService.sendDeliveryOtpEmail(
+          item.order.customer.email,
+          customerName,
+          item.order.orderNumber,
+          item.productName,
+          generatedOtp,
+        );
+      }
+
+      await this.syncParentOrderStatus(item.orderId);
+      return item;
+    }
+
+    if (status === OrderItemStatusEnum.DELIVERED) {
+      if (!otp) {
+        throw new BadRequestException(
+          'Delivery OTP is required to mark product as delivered.',
+        );
+      }
+      if (!item.deliveryOtp || item.deliveryOtp !== otp.trim()) {
+        throw new BadRequestException(
+          'Invalid delivery OTP. Verification failed.',
+        );
+      }
+      item.status = status;
+      item.deliveredAt = new Date();
+      item.deliveryOtp = undefined;
+      await this.orderItemRepository.save(item);
+
+      await this.syncParentOrderStatus(item.orderId);
+      return item;
+    }
+
     item.status = status;
-    if (status === OrderItemStatusEnum.DELIVERED) item.deliveredAt = new Date();
     if (status === OrderItemStatusEnum.CANCELLED) item.cancelledAt = new Date();
     await this.orderItemRepository.save(item);
 
     await this.syncParentOrderStatus(item.orderId);
     return item;
+  }
+
+  async resendVendorDeliveryOtp(vendorId: string, itemId: string) {
+    const item = await this.orderItemRepository.findOne({
+      where: { id: itemId, vendorId },
+      relations: { order: { customer: { profile: true } } },
+    });
+    if (!item) throw new NotFoundException('Order item not found for vendor');
+
+    if (item.status === OrderItemStatusEnum.DELIVERED) {
+      throw new BadRequestException('Order item has already been delivered.');
+    }
+    if (item.status === OrderItemStatusEnum.CANCELLED) {
+      throw new BadRequestException('Order item has been cancelled.');
+    }
+
+    const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    item.deliveryOtp = newOtp;
+    await this.orderItemRepository.save(item);
+
+    if (item.order?.customer?.email) {
+      const profileName = item.order.customer.profile?.firstName
+        ? `${item.order.customer.profile.firstName} ${item.order.customer.profile.lastName || ''}`.trim()
+        : null;
+      const customerName =
+        profileName || item.order.shippingFullName || 'Valued Customer';
+      await this.mailService.sendDeliveryOtpEmail(
+        item.order.customer.email,
+        customerName,
+        item.order.orderNumber,
+        item.productName,
+        newOtp,
+      );
+    } else {
+      throw new BadRequestException('Customer email address not found');
+    }
+
+    return { success: true, message: 'Delivery OTP resent successfully.' };
   }
 
   async findAllOrdersForAdmin() {
@@ -283,9 +370,15 @@ export class OrdersService {
     const allCancelled = items.every(
       (i) => i.status === OrderItemStatusEnum.CANCELLED,
     );
+    const allOutForDelivery = items.every(
+      (i) =>
+        i.status === OrderItemStatusEnum.OUT_FOR_DELIVERY ||
+        i.status === OrderItemStatusEnum.DELIVERED,
+    );
     const allShipped = items.every(
       (i) =>
         i.status === OrderItemStatusEnum.SHIPPED ||
+        i.status === OrderItemStatusEnum.OUT_FOR_DELIVERY ||
         i.status === OrderItemStatusEnum.DELIVERED,
     );
 
@@ -300,9 +393,11 @@ export class OrdersService {
     } else if (allCancelled) {
       order.status = OrderStatusEnum.CANCELLED;
       order.cancelledAt = new Date();
+    } else if (allOutForDelivery) {
+      order.status = OrderStatusEnum.OUT_FOR_DELIVERY;
     } else if (allShipped) {
       order.status = OrderStatusEnum.SHIPPED;
-      order.shippedAt = new Date();
+      if (!order.shippedAt) order.shippedAt = new Date();
     } else if (items.some((i) => i.status === OrderItemStatusEnum.CANCELLED)) {
       order.status = OrderStatusEnum.PARTIALLY_CANCELLED;
     }

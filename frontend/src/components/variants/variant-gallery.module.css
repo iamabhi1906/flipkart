@@ -1,0 +1,65 @@
+.galleryContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.mainView {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--mui-palette-divider, #e2e8f0);
+  background-color: var(--mui-palette-background-paper, #ffffff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mainImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.thumbnailStrip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.thumbnailItem {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  background-color: var(--mui-palette-background-default, #f8fafc);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.thumbnailItem:hover {
+  border-color: var(--mui-palette-primary-light, #93c5fd);
+  transform: translateY(-2px);
+}
+
+.thumbnailActive {
+  border-color: var(--mui-palette-primary-main, #2874f0);
+  box-shadow: 0 0 0 2px rgba(40, 116, 240, 0.2);
+}
+
+.thumbnailImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.noImage {
+  color: var(--mui-palette-text-secondary, #64748b);
+  font-size: 14px;
+}

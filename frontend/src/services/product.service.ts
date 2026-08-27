@@ -8,6 +8,8 @@ export interface ProductVariantData {
   price?: number;
   stockQuantity: number;
   attributes?: Record<string, any>;
+  images?: string[];
+  thumbnail?: string;
 }
 
 export interface ProductData {

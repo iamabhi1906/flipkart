@@ -1,0 +1,44 @@
+.itemCard {
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid var(--mui-palette-divider, #cbd5e1);
+  background-color: var(--mui-palette-background-paper, #ffffff);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.itemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.inputsGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 12px;
+}
+
+.attrRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.attrList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: var(--mui-palette-action-hover, #f8fafc);
+  border: 1px dashed var(--mui-palette-divider, #cbd5e1);
+}
+
+@media (max-width: 768px) {
+  .inputsGrid {
+    grid-template-columns: 1fr;
+  }
+}

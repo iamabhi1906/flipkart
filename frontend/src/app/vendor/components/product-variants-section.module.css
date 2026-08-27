@@ -1,0 +1,32 @@
+.sectionBox {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.topHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.headerTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.emptyBox {
+  text-align: center;
+  padding: 24px;
+  border-radius: 8px;
+  background-color: var(--mui-palette-action-hover, #f8fafc);
+  border: 1px dashed var(--mui-palette-divider, #cbd5e1);
+}
+
+.variantsList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}

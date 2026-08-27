@@ -1,0 +1,39 @@
+.actionsRow {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.cartBtn {
+  background-color: #ff9f00 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  padding: 12px 24px !important;
+  border-radius: 8px !important;
+}
+
+.cartBtn:hover {
+  background-color: #f39200 !important;
+}
+
+.buyBtn {
+  background-color: #fb641b !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  padding: 12px 24px !important;
+  border-radius: 8px !important;
+}
+
+.buyBtn:hover {
+  background-color: #e65612 !important;
+}
+
+.qtyBox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: #fff3e0;
+  padding: 6px 16px;
+  border-radius: 8px;
+  border: 1px solid #ffb74d;
+}

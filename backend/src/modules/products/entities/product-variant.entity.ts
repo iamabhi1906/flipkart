@@ -32,6 +32,12 @@ export class ProductVariant {
   @Column({ type: 'jsonb', nullable: true })
   attributes?: Record<string, any>;
 
+  @Column({ type: 'jsonb', nullable: true })
+  images?: string[];
+
+  @Column({ length: 500, nullable: true })
+  thumbnail?: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 

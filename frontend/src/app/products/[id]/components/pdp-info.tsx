@@ -1,12 +1,11 @@
 "use client";
 
 import React from "react";
-import { Box, Typography, Button, Chip } from "@mui/material";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import FlashOnIcon from "@mui/icons-material/FlashOn";
+import { Box, Typography, Chip } from "@mui/material";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import { ProductData, ProductVariantData } from "@/services/product.service";
-import { useCart } from "@/context/cart-context";
+import VariantSelector from "@/components/variants/variant-selector";
+import PdpActions from "./pdp-actions";
 import styles from "../pdp.module.css";
 
 interface PdpInfoProps {
@@ -24,13 +23,6 @@ export default function PdpInfo({
   selectedVariant,
   onSelectVariant,
 }: PdpInfoProps) {
-  const {
-    cart,
-    addItemToCart,
-    updateItemQuantity,
-    loading: cartLoading,
-  } = useCart();
-
   const comparePrice = Number(product.compareAtPrice || 0);
   const discountPercent =
     comparePrice > displayPrice
@@ -42,18 +34,17 @@ export default function PdpInfo({
     product.vendor?.email ||
     "Flipkart Verified Seller";
 
-  const existingCartItem = cart?.items.find((item) => {
-    if (item.productId !== product.id) return false;
-    if (selectedVariant) {
-      return item.variantId === selectedVariant.id;
-    }
-    return !item.variantId;
-  });
-
-  const handleAdd = () => {
-    if (!product.id) return;
-    addItemToCart(product.id, selectedVariant?.id, 1);
-  };
+  const variantsList = (product.variants || []).map((v, idx) => ({
+    id: v.id || `variant-${idx}`,
+    productId: v.productId || product.id || "",
+    name: v.name,
+    sku: v.sku,
+    price: v.price ? Number(v.price) : Number(product.price || 0),
+    stockQuantity: Number(v.stockQuantity || 0),
+    attributes: (v.attributes as Record<string, string>) || {},
+    images: (v as any).images || [],
+    thumbnail: (v as any).thumbnail || "",
+  }));
 
   return (
     <Box className={styles.infoSection}>
@@ -81,134 +72,33 @@ export default function PdpInfo({
         )}
       </Box>
 
-      {product.variants && product.variants.length > 0 && (
-        <Box className={styles.variantsSection}>
-          <Typography className={styles.variantLabel}>
-            Available Variants:
-          </Typography>
-          <Box className={styles.variantChipsRow}>
-            {product.variants.map((variant) => {
-              const isSelected = selectedVariant?.id === variant.id;
-              return (
-                <Chip
-                  key={variant.id}
-                  label={`${variant.name} (${variant.price ? `₹${variant.price}` : `₹${product.price}`})`}
-                  variant={isSelected ? "filled" : "outlined"}
-                  className={`${styles.variantChip} ${
-                    isSelected ? styles.activeVariantChip : ""
-                  }`}
-                  onClick={() => onSelectVariant(variant)}
-                />
+      {variantsList.length > 0 && (
+        <VariantSelector
+          variants={variantsList}
+          basePrice={Number(product.price || 0)}
+          onVariantChange={(res) => {
+            if (res.selectedVariant) {
+              const matched = product.variants?.find(
+                (v) => (v.id || `variant-${product.variants?.indexOf(v)}`) === res.selectedVariant?.id
               );
-            })}
-          </Box>
-        </Box>
+              if (matched) onSelectVariant(matched);
+            }
+          }}
+        />
       )}
-
-      <Box style={{ display: "flex", gap: 12, alignItems: "center" }}>
-        {effectiveStock > 0 ? (
-          <Chip
-            label={`In Stock (${effectiveStock} units available)`}
-            color="success"
-            size="small"
-          />
-        ) : (
-          <Chip label="Currently Out of Stock" color="error" size="small" />
-        )}
-        {product.sku && (
-          <Typography variant="caption" style={{ color: "#64748b" }}>
-            SKU: {selectedVariant?.sku || product.sku}
-          </Typography>
-        )}
-      </Box>
 
       <Box className={styles.sellerBadge}>
         <VerifiedIcon style={{ color: "#2874f0", fontSize: 20 }} />
-        <Typography
-          variant="body2"
-          style={{ fontWeight: 600 }}
-          color="textPrimary"
-        >
+        <Typography variant="body2" style={{ fontWeight: 600 }}>
           Sold by: {vendorName}
         </Typography>
       </Box>
 
-      <Box className={styles.actionsRow}>
-        {existingCartItem ? (
-          <Box
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              backgroundColor: "#fff3e0",
-              padding: "6px 16px",
-              borderRadius: 8,
-              border: "1px solid #ffb74d",
-            }}
-          >
-            <Typography
-              variant="body2"
-              style={{ fontWeight: 700, color: "#e65100" }}
-            >
-              IN CART:
-            </Typography>
-            <Button
-              variant="outlined"
-              size="small"
-              style={{ minWidth: 36, fontWeight: 800, fontSize: 16 }}
-              onClick={() =>
-                updateItemQuantity(
-                  existingCartItem.id,
-                  existingCartItem.quantity - 1,
-                )
-              }
-              disabled={cartLoading}
-            >
-              -
-            </Button>
-            <Typography
-              variant="subtitle1"
-              style={{ fontWeight: 800, minWidth: 28, textAlign: "center" }}
-            >
-              {existingCartItem.quantity}
-            </Typography>
-            <Button
-              variant="outlined"
-              size="small"
-              style={{ minWidth: 36, fontWeight: 800, fontSize: 16 }}
-              onClick={() =>
-                updateItemQuantity(
-                  existingCartItem.id,
-                  existingCartItem.quantity + 1,
-                )
-              }
-              disabled={cartLoading}
-            >
-              +
-            </Button>
-          </Box>
-        ) : (
-          <Button
-            variant="contained"
-            className={styles.cartBtn}
-            startIcon={<ShoppingCartIcon />}
-            disabled={effectiveStock <= 0 || cartLoading}
-            onClick={handleAdd}
-          >
-            {cartLoading ? "ADDING..." : "ADD TO CART"}
-          </Button>
-        )}
-
-        <Button
-          variant="contained"
-          className={styles.buyBtn}
-          startIcon={<FlashOnIcon />}
-          disabled={effectiveStock <= 0 || cartLoading}
-          onClick={handleAdd}
-        >
-          BUY NOW
-        </Button>
-      </Box>
+      <PdpActions
+        product={product}
+        selectedVariant={selectedVariant}
+        effectiveStock={effectiveStock}
+      />
     </Box>
   );
 }

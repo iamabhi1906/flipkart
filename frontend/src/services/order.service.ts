@@ -45,10 +45,17 @@ export const getVendorOrderItems = async () => {
 export const updateVendorOrderItemStatus = async (
   itemId: string,
   status: string,
+  otp?: string,
 ) => {
   const response = await api.patch(`/orders/vendor/items/${itemId}/status`, {
     status,
+    otp,
   });
+  return response.data?.data || response.data;
+};
+
+export const resendVendorDeliveryOtp = async (itemId: string) => {
+  const response = await api.post(`/orders/vendor/items/${itemId}/resend-otp`);
   return response.data?.data || response.data;
 };
 

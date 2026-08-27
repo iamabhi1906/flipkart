@@ -29,6 +29,7 @@ export class ProductsController {
     private readonly storageService: StorageService,
   ) {}
 
+  @Public()
   @Post('upload-image')
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(@UploadedFile() file: Express.Multer.File) {

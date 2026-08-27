@@ -35,6 +35,17 @@ export function useProductDetail(productId: string) {
     load();
   }, [productId]);
 
+  useEffect(() => {
+    if (!selectedVariant) return;
+    const variantImgs = (selectedVariant as any).images || [];
+    const variantThumb = (selectedVariant as any).thumbnail;
+    if (variantThumb) {
+      setSelectedImage(variantThumb);
+    } else if (variantImgs.length > 0 && variantImgs[0]) {
+      setSelectedImage(variantImgs[0]);
+    }
+  }, [selectedVariant]);
+
   const displayPrice = selectedVariant?.price ? Number(selectedVariant.price) : Number(product?.price || 0);
   const effectiveStock = product?.variants && product.variants.length > 0
     ? selectedVariant

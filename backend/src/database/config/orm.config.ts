@@ -18,7 +18,7 @@ export const ormConfig: TypeOrmModuleAsyncOptions = {
     migrations: [join(__dirname, '..', 'migrations', '*.{js,ts}')],
 
     logging: false,
-    migrationsRun: false,
+    migrationsRun: true,
     synchronize: false,
     namingStrategy: new SnakeNamingStrategy(),
   }),

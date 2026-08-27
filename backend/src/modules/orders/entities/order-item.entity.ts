@@ -67,6 +67,9 @@ export class OrderItem {
   @Column({ type: 'timestamp', nullable: true })
   deliveredAt?: Date;
 
+  @Column({ length: 10, nullable: true })
+  deliveryOtp?: string;
+
   @CreateDateColumn({})
   createdAt!: Date;
 

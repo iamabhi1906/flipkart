@@ -59,6 +59,9 @@ importers:
       dotenv:
         specifier: ^17.4.2
         version: 17.4.2
+      ejs:
+        specifier: ^6.0.1
+        version: 6.0.1
       express:
         specifier: ^5.2.1
         version: 5.2.1(supports-color@8.1.1)
@@ -114,6 +117,9 @@ importers:
       '@types/cookie-parser':
         specifier: ^1.4.10
         version: 1.4.10(@types/express@5.0.6)
+      '@types/ejs':
+        specifier: ^3.1.5
+        version: 3.1.5
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.6
@@ -2112,6 +2118,11 @@ packages:
 
   ejs@5.0.2:
     resolution: {integrity: sha512-IpbUaI/CAW86l3f+T8zN0iggSc0LmMZLcIW5eRVStLVNCoTXkE0YlncbbH50fp8Cl6zHIky0sW2uUbhBqGw0Jw==}
+    engines: {node: '>=0.12.18'}
+    hasBin: true
+
+  ejs@6.0.1:
+    resolution: {integrity: sha512-UaaM14yby8U3k02ihS1Bmj5Kz2d7CCQM1scxpgs4Mhkq8F1wR2gl3+Ts4h5Ne4Mnt7M9m4Dw7jsuMr3+xO4vZA==}
     engines: {node: '>=0.12.18'}
     hasBin: true
 
@@ -5723,8 +5734,7 @@ snapshots:
 
   '@types/cookiejar@2.1.5': {}
 
-  '@types/ejs@3.1.5':
-    optional: true
+  '@types/ejs@3.1.5': {}
 
   '@types/eslint-scope@3.7.7':
     dependencies:
@@ -6820,6 +6830,8 @@ snapshots:
 
   ejs@5.0.2:
     optional: true
+
+  ejs@6.0.1: {}
 
   electron-to-chromium@1.5.408: {}
 

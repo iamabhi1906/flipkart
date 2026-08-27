@@ -17,6 +17,7 @@ import StarIcon from "@mui/icons-material/Star";
 import { getMyOrders, cancelCustomerOrder } from "@/services/order.service";
 import { getOrderItemReview, ReviewData } from "@/services/review.service";
 import ReviewModal from "@/components/review-modal";
+import OrderStepper from "./stepper";
 
 const STATUS_COLORS: Record<
   string,
@@ -30,6 +31,18 @@ const STATUS_COLORS: Record<
   cancelled: "error",
   partially_cancelled: "error",
 };
+
+const deliveryStatus = [
+  "pending",
+  "confirmed",
+  "processing",
+  "shipped",
+  "out_for_delivery",
+  "delivered",
+  "cancelled",
+  "partially_cancelled",
+  "completed",
+];
 
 export default function CustomerOrders() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -155,15 +168,7 @@ export default function CustomerOrders() {
           const isCancelling = cancellingId === order.id;
 
           return (
-            <Paper
-              key={order.id}
-              elevation={0}
-              style={{
-                border: "1px solid #e2e8f0",
-                borderRadius: 8,
-                padding: 16,
-              }}
-            >
+            <Paper key={order.id} elevation={0}>
               <Box
                 style={{
                   display: "flex",
@@ -203,6 +208,8 @@ export default function CustomerOrders() {
               </Box>
 
               <Divider style={{ margin: "12px 0" }} />
+
+              <OrderStepper order={order} />
 
               <Box
                 style={{ display: "flex", flexDirection: "column", gap: 12 }}

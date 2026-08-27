@@ -34,7 +34,16 @@ export class OrdersController {
       req.user.id,
       itemId,
       dto.status,
+      dto.otp,
     );
+  }
+
+  @Post('vendor/items/:itemId/resend-otp')
+  resendVendorDeliveryOtp(
+    @Param('itemId') itemId: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.ordersService.resendVendorDeliveryOtp(req.user.id, itemId);
   }
 
   @Get('admin/all')

@@ -9,6 +9,7 @@ import { join } from 'path';
 import { ormConfig } from './database/config/orm.config';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { MailModule } from './modules/mail/mail.module';
 import { VendorsModule } from './modules/vendors/vendors.module';
 import { AdminsModule } from './modules/admins/admins.module';
 import { AddressesModule } from './modules/addresses/addresses.module';
@@ -40,6 +41,7 @@ import { JwtAuthGuard } from './modules/common/guards/jwt-auth.guard';
     TypeOrmModule.forRootAsync(ormConfig),
     UsersModule,
     AuthModule,
+    MailModule,
     VendorsModule,
     AdminsModule,
     AddressesModule,
