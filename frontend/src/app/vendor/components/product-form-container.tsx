@@ -102,10 +102,18 @@ export default function ProductFormContainer({
       { name: "", stockQuantity: 10, price: undefined, attributes: {}, images: [], thumbnail: "" },
     ]);
   };
-  const handleUpdateVariant = (idx: number, field: string, val: any) => {
+  const handleUpdateVariant = (
+    idx: number,
+    fieldOrObject: string | Record<string, any>,
+    val?: any,
+  ) => {
     const updated = [...variants];
-    updated[idx] = { ...updated[idx], [field]: val };
-    setValue("variants", updated);
+    if (typeof fieldOrObject === "object" && fieldOrObject !== null) {
+      updated[idx] = { ...updated[idx], ...fieldOrObject };
+    } else if (typeof fieldOrObject === "string") {
+      updated[idx] = { ...updated[idx], [fieldOrObject]: val };
+    }
+    setValue("variants", updated, { shouldValidate: true, shouldDirty: true });
   };
   const handleRemoveVariant = (idx: number) => {
     setValue("variants", variants.filter((_, i) => i !== idx));

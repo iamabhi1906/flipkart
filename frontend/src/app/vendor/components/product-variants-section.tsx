@@ -11,7 +11,11 @@ import styles from "./product-variants-section.module.css";
 interface ProductVariantsSectionProps {
   variants: ProductVariantFormValues[];
   onAddVariant: () => void;
-  onUpdateVariant: (index: number, field: string, val: any) => void;
+  onUpdateVariant: (
+    index: number,
+    fieldOrObject: string | Record<string, any>,
+    val?: any,
+  ) => void;
   onRemoveVariant: (index: number) => void;
 }
 

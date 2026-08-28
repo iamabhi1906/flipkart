@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Box, Typography, Chip } from "@mui/material";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import { ProductData, ProductVariantData } from "@/services/product.service";
@@ -34,17 +34,19 @@ export default function PdpInfo({
     product.vendor?.email ||
     "Flipkart Verified Seller";
 
-  const variantsList = (product.variants || []).map((v, idx) => ({
-    id: v.id || `variant-${idx}`,
-    productId: v.productId || product.id || "",
-    name: v.name,
-    sku: v.sku,
-    price: v.price ? Number(v.price) : Number(product.price || 0),
-    stockQuantity: Number(v.stockQuantity || 0),
-    attributes: (v.attributes as Record<string, string>) || {},
-    images: (v as any).images || [],
-    thumbnail: (v as any).thumbnail || "",
-  }));
+  const variantsList = useMemo(() => {
+    return (product.variants || []).map((v, idx) => ({
+      id: v.id || `variant-${idx}`,
+      productId: v.productId || product.id || "",
+      name: v.name,
+      sku: v.sku,
+      price: v.price ? Number(v.price) : Number(product.price || 0),
+      stockQuantity: Number(v.stockQuantity || 0),
+      attributes: (v.attributes as Record<string, string>) || {},
+      images: (v as any).images || [],
+      thumbnail: (v as any).thumbnail || "",
+    }));
+  }, [product.variants, product.id, product.price]);
 
   return (
     <Box className={styles.infoSection}>
@@ -75,11 +77,14 @@ export default function PdpInfo({
       {variantsList.length > 0 && (
         <VariantSelector
           variants={variantsList}
+          selectedVariant={selectedVariant as any}
           basePrice={Number(product.price || 0)}
           onVariantChange={(res) => {
             if (res.selectedVariant) {
               const matched = product.variants?.find(
-                (v) => (v.id || `variant-${product.variants?.indexOf(v)}`) === res.selectedVariant?.id
+                (v) =>
+                  (v.id && v.id === res.selectedVariant?.id) ||
+                  (v.name && v.name === res.selectedVariant?.name)
               );
               if (matched) onSelectVariant(matched);
             }

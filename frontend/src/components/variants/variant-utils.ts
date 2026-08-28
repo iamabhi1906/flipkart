@@ -1,11 +1,41 @@
 import { ProductVariantData, SelectedAttributes, AttributeMap } from "./variant-types";
 
+export function parseVariantAttributes(v: ProductVariantData): Record<string, string> {
+  if (v.attributes && Object.keys(v.attributes).length > 0) {
+    const cleaned: Record<string, string> = {};
+    Object.entries(v.attributes).forEach(([k, val]) => {
+      if (val !== undefined && val !== null && String(val).trim() !== "") {
+        cleaned[k.trim()] = String(val).trim();
+      }
+    });
+    if (Object.keys(cleaned).length > 0) return cleaned;
+  }
+
+  if (v.name && v.name.includes("/")) {
+    const parts = v.name.split("/").map((s) => s.trim());
+    if (parts.length >= 2) {
+      return {
+        Color: parts[0],
+        Storage: parts[1],
+      };
+    } else if (parts.length === 1 && parts[0]) {
+      return { Color: parts[0] };
+    }
+  }
+
+  if (v.name) {
+    return { Color: v.name.trim() };
+  }
+
+  return {};
+}
+
 export function extractAttributeMap(variants: ProductVariantData[]): AttributeMap {
   const map: AttributeMap = {};
   variants.forEach((v) => {
-    if (!v.attributes) return;
-    Object.entries(v.attributes).forEach(([key, val]) => {
-      const normalizedKey = key.trim();
+    const attrs = parseVariantAttributes(v);
+    Object.entries(attrs).forEach(([key, val]) => {
+      const normalizedKey = key;
       const normalizedVal = String(val).trim();
       if (!map[normalizedKey]) {
         map[normalizedKey] = [];
@@ -28,11 +58,12 @@ export function findMatchingVariant(
 
   return (
     variants.find((v) => {
-      if (!v.attributes) return false;
+      const attrs = parseVariantAttributes(v);
       return selectedKeys.every(
-        (key) => String(v.attributes?.[key]).trim() === String(selected[key]).trim()
+        (key) =>
+          String(attrs[key] || "").toLowerCase() === String(selected[key] || "").toLowerCase()
       );
-    }) || null
+    }) || variants[0]
   );
 }
 
@@ -40,6 +71,5 @@ export function getInitialSelectedAttributes(
   variants: ProductVariantData[]
 ): SelectedAttributes {
   if (!variants || variants.length === 0) return {};
-  const firstVariant = variants[0];
-  return firstVariant.attributes ? { ...firstVariant.attributes } : {};
+  return parseVariantAttributes(variants[0]);
 }

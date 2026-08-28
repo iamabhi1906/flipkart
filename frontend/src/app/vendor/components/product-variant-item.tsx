@@ -5,13 +5,17 @@ import { Box, Typography, TextField, IconButton } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ProductVariantFormValues } from "../schemas/product-form-schema";
 import ProductVariantAttributes from "./product-variant-attributes";
-import ProductImageDropzone from "./product-image-dropzone";
+import VariantImageManager from "@/components/variants/variant-image-manager";
 import styles from "./product-variant-item.module.css";
 
 interface ProductVariantItemProps {
   index: number;
   variant: ProductVariantFormValues;
-  onUpdateVariant: (index: number, field: string, val: any) => void;
+  onUpdateVariant: (
+    index: number,
+    fieldOrObject: string | Record<string, any>,
+    val?: any,
+  ) => void;
   onRemoveVariant: (index: number) => void;
 }
 
@@ -24,11 +28,10 @@ export default function ProductVariantItem({
   const images = variant.images || [];
 
   const handleImagesChange = (newUrls: string[]) => {
-    console.log(newUrls);
-    onUpdateVariant(index, "images", newUrls);
-    if (newUrls.length > 0) {
-      onUpdateVariant(index, "thumbnail", newUrls[0]);
-    }
+    onUpdateVariant(index, {
+      images: newUrls,
+      thumbnail: newUrls.length > 0 ? newUrls[0] : "",
+    });
   };
 
   return (
@@ -79,11 +82,10 @@ export default function ProductVariantItem({
         />
       </Box>
 
-      <ProductImageDropzone
+      <VariantImageManager
         label={`Variant #${index + 1} Images`}
         images={images}
-        onChangeImages={handleImagesChange}
-        multiple
+        onChange={handleImagesChange}
       />
 
       <ProductVariantAttributes

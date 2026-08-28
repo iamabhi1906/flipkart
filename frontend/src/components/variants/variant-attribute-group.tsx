@@ -11,6 +11,7 @@ interface VariantAttributeGroupProps {
   selectedValue: string;
   onSelectOption: (option: string) => void;
   isOptionAvailable?: (option: string) => boolean;
+  getOptionImage?: (option: string) => string | undefined;
 }
 
 export default function VariantAttributeGroup({
@@ -19,12 +20,15 @@ export default function VariantAttributeGroup({
   selectedValue,
   onSelectOption,
   isOptionAvailable = () => true,
+  getOptionImage,
 }: VariantAttributeGroupProps) {
+  const isColorAttr = attributeName.toLowerCase().includes("color");
+
   return (
     <Box className={styles.groupContainer}>
       <Box className={styles.groupHeader}>
         <Typography className={styles.attributeTitle}>
-          {attributeName}:
+          {attributeName.toUpperCase()}:
         </Typography>
         <Typography className={styles.selectedValue}>
           {selectedValue || "Select"}
@@ -35,6 +39,7 @@ export default function VariantAttributeGroup({
         {options.map((option) => {
           const isSelected = selectedValue === option;
           const available = isOptionAvailable(option);
+          const imageUrl = getOptionImage ? getOptionImage(option) : undefined;
 
           return (
             <VariantChip
@@ -42,6 +47,7 @@ export default function VariantAttributeGroup({
               label={option}
               selected={isSelected}
               disabled={!available}
+              imageUrl={isColorAttr ? imageUrl : undefined}
               onClick={() => onSelectOption(option)}
             />
           );

@@ -1,48 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
-import {
-  Box,
-  Typography,
-  Chip,
-  Button,
-  CircularProgress,
-  Alert,
-  Paper,
-  Divider,
-} from "@mui/material";
+import { Box, Typography, CircularProgress, Alert } from "@mui/material";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
-import StarIcon from "@mui/icons-material/Star";
 import { getMyOrders, cancelCustomerOrder } from "@/services/order.service";
 import { getOrderItemReview, ReviewData } from "@/services/review.service";
 import ReviewModal from "@/components/review-modal";
-import OrderStepper from "./stepper";
-
-const STATUS_COLORS: Record<
-  string,
-  "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"
-> = {
-  pending: "warning",
-  confirmed: "info",
-  processing: "primary",
-  shipped: "secondary",
-  delivered: "success",
-  cancelled: "error",
-  partially_cancelled: "error",
-};
-
-const deliveryStatus = [
-  "pending",
-  "confirmed",
-  "processing",
-  "shipped",
-  "out_for_delivery",
-  "delivered",
-  "cancelled",
-  "partially_cancelled",
-  "completed",
-];
+import CustomerOrderCard from "./customer-order-card";
+import styles from "./customer-orders.module.css";
 
 export default function CustomerOrders() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -53,7 +18,6 @@ export default function CustomerOrders() {
     msg: string;
   } | null>(null);
 
-  // Review Modal State
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [selectedReviewItem, setSelectedReviewItem] = useState<{
     orderItemId: string;
@@ -71,7 +35,6 @@ export default function CustomerOrders() {
       const loadedOrders = Array.isArray(data) ? data : [];
       setOrders(loadedOrders);
 
-      // Fetch reviews for delivered items
       const map: Record<string, ReviewData> = {};
       for (const order of loadedOrders) {
         if (order.items) {
@@ -140,12 +103,12 @@ export default function CustomerOrders() {
   };
 
   return (
-    <Box style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <Box style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <ShoppingBagIcon style={{ color: "#2874f0" }} />
+    <Box className={styles.container}>
+      <Box className={styles.header}>
+        <ShoppingBagIcon className={styles.headerIcon} />
         <Typography
           variant="h6"
-          style={{ fontWeight: 700 }}
+          className={styles.headerTitle}
           color="textPrimary"
         >
           My Order History ({orders.length})
@@ -161,171 +124,16 @@ export default function CustomerOrders() {
       ) : orders.length === 0 ? (
         <Alert severity="info">You haven&apos;t placed any orders yet.</Alert>
       ) : (
-        orders.map((order) => {
-          const canCancel = ["pending", "confirmed", "processing"].includes(
-            order.status,
-          );
-          const isCancelling = cancellingId === order.id;
-
-          return (
-            <Paper key={order.id} elevation={0}>
-              <Box
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: 12,
-                }}
-              >
-                <Box>
-                  <Typography
-                    variant="subtitle1"
-                    style={{ fontWeight: 800, color: "#0f172a" }}
-                  >
-                    Order #{order.orderNumber}
-                  </Typography>
-                  <Typography variant="caption" style={{ color: "#64748b" }}>
-                    Placed on:{" "}
-                    {new Date(
-                      order.createdAt || order.placedAt,
-                    ).toLocaleDateString()}
-                  </Typography>
-                </Box>
-                <Box style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <Chip
-                    label={(order.status || "pending").toUpperCase()}
-                    color={STATUS_COLORS[order.status] || "default"}
-                    size="small"
-                    style={{ fontWeight: 700 }}
-                  />
-                  <Typography
-                    variant="h6"
-                    style={{ fontWeight: 800, color: "#2874f0" }}
-                  >
-                    ₹{Number(order.totalAmount).toLocaleString("en-IN")}
-                  </Typography>
-                </Box>
-              </Box>
-
-              <Divider style={{ margin: "12px 0" }} />
-
-              <OrderStepper order={order} />
-
-              <Box
-                style={{ display: "flex", flexDirection: "column", gap: 12 }}
-              >
-                {order.items?.map((item: any) => {
-                  const imgUrl =
-                    item.product?.images?.[0]?.imageUrl ||
-                    item.product?.images?.[0] ||
-                    "/placeholder.png";
-                  const isDelivered =
-                    item.status === "delivered" || order.status === "delivered";
-                  const existingReview = reviewsMap[item.id];
-
-                  return (
-                    <Box
-                      key={item.id}
-                      style={{
-                        display: "flex",
-                        gap: 12,
-                        alignItems: "center",
-                        flexWrap: "wrap",
-                      }}
-                    >
-                      <Image
-                        src={imgUrl}
-                        alt={item.productName}
-                        width={50}
-                        height={50}
-                        style={{ borderRadius: 6, objectFit: "cover" }}
-                        unoptimized
-                      />
-                      <Box style={{ flex: 1, minWidth: "200px" }}>
-                        <Typography variant="body2" style={{ fontWeight: 700 }}>
-                          {item.productName}
-                        </Typography>
-                        <Typography
-                          variant="caption"
-                          style={{ color: "#64748b" }}
-                        >
-                          Qty: {item.quantity} | Unit: ₹
-                          {Number(item.unitPrice).toLocaleString("en-IN")}
-                        </Typography>
-                      </Box>
-
-                      <Chip
-                        label={(item.status || "confirmed").toUpperCase()}
-                        variant="outlined"
-                        size="small"
-                        style={{ fontSize: 11 }}
-                      />
-
-                      {/* Rating and Review action for delivered items */}
-                      {isDelivered && (
-                        <Box sx={{ ml: "auto" }}>
-                          {existingReview ? (
-                            <Button
-                              variant="outlined"
-                              color="success"
-                              size="small"
-                              startIcon={<StarIcon sx={{ color: "#faaf00" }} />}
-                              onClick={() =>
-                                handleOpenReviewModal(item, order.status)
-                              }
-                              sx={{
-                                textTransform: "none",
-                                fontWeight: 700,
-                                borderRadius: "6px",
-                              }}
-                            >
-                              ★ {existingReview.rating} Rated (Edit)
-                            </Button>
-                          ) : (
-                            <Button
-                              variant="contained"
-                              size="small"
-                              startIcon={<StarIcon />}
-                              onClick={() =>
-                                handleOpenReviewModal(item, order.status)
-                              }
-                              sx={{
-                                backgroundColor: "#388e3c",
-                                "&:hover": { backgroundColor: "#2e7d32" },
-                                textTransform: "none",
-                                fontWeight: 700,
-                                borderRadius: "6px",
-                              }}
-                            >
-                              Rate & Review
-                            </Button>
-                          )}
-                        </Box>
-                      )}
-                    </Box>
-                  );
-                })}
-              </Box>
-
-              {canCancel && (
-                <>
-                  <Divider style={{ margin: "12px 0" }} />
-                  <Box style={{ display: "flex", justifyContent: "flex-end" }}>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      size="small"
-                      disabled={isCancelling}
-                      onClick={() => handleCancelOrder(order.id)}
-                    >
-                      {isCancelling ? "CANCELLING..." : "CANCEL ORDER"}
-                    </Button>
-                  </Box>
-                </>
-              )}
-            </Paper>
-          );
-        })
+        orders.map((order) => (
+          <CustomerOrderCard
+            key={order.id}
+            order={order}
+            cancellingId={cancellingId}
+            reviewsMap={reviewsMap}
+            onCancelOrder={handleCancelOrder}
+            onOpenReviewModal={handleOpenReviewModal}
+          />
+        ))
       )}
 
       {selectedReviewItem && (

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Box, ButtonBase } from "@mui/material";
 import Image from "next/image";
 import { ProductData } from "@/services/product.service";
@@ -19,28 +19,35 @@ export default function PdpGallery({
   onSelectImage,
   selectedVariant,
 }: PdpGalleryProps) {
-  const baseImages =
-    product.images && product.images.length > 0
-      ? product.images.map((i: any) => i.imageUrl || i)
-      : product.imageUrls && product.imageUrls.length > 0
-      ? product.imageUrls
-      : [];
+  const baseImages = useMemo(() => {
+    if (product.images && product.images.length > 0) {
+      return product.images.map((i: any) => i.imageUrl || i);
+    }
+    if (product.imageUrls && product.imageUrls.length > 0) {
+      return product.imageUrls;
+    }
+    return [];
+  }, [product]);
 
-  const variantImages = selectedVariant?.images || [];
-  const variantThumb = selectedVariant?.thumbnail;
+  const images = useMemo(() => {
+    const vImages = selectedVariant?.images || [];
+    const vThumb = selectedVariant?.thumbnail;
 
-  const combined = Array.from(
-    new Set(
-      [
-        ...(variantThumb ? [variantThumb] : []),
-        ...variantImages,
-        ...baseImages,
-      ].filter((u) => u && typeof u === "string" && u.trim() !== "")
-    )
-  );
+    const list: string[] = [];
+    if (vThumb && typeof vThumb === "string" && vThumb.trim() !== "") {
+      list.push(vThumb);
+    }
+    vImages.forEach((img: string) => {
+      if (img && typeof img === "string" && img.trim() !== "" && !list.includes(img)) {
+        list.push(img);
+      }
+    });
 
-  const images = combined.length > 0 ? combined : ["/placeholder.png"];
-  const mainUrl = selectedImage || images[0];
+    if (list.length > 0) return list;
+    return baseImages.length > 0 ? baseImages : ["/placeholder.png"];
+  }, [selectedVariant, baseImages]);
+
+  const mainUrl = selectedImage && images.includes(selectedImage) ? selectedImage : images[0];
 
   return (
     <Box className={styles.gallerySection}>
@@ -67,7 +74,7 @@ export default function PdpGallery({
             >
               <Image
                 src={url}
-                alt={`${product.name} thumbnail ${idx}`}
+                alt={`${product.name} thumbnail ${idx + 1}`}
                 width={60}
                 height={60}
                 className={styles.thumbImg}

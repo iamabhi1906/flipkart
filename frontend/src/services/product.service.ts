@@ -100,5 +100,10 @@ export const uploadProductImage = async (file: File): Promise<string> => {
       "Content-Type": "multipart/form-data",
     },
   });
-  return response.data?.url || response.data?.data?.url;
+  const resData = response.data;
+  return (
+    resData?.data?.url ||
+    resData?.url ||
+    (typeof resData === "string" ? resData : "")
+  );
 };
