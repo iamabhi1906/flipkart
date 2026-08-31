@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  output: "standalone",
   images: {
     remotePatterns: [
       {
@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
         hostname: "rukminim1.flixcart.com",
         pathname: "/**", // Allows all paths under this domain
       },
-       {
+      {
         protocol: "https",
         hostname: "rukminim2.flixcart.com",
         pathname: "/**", // Allows all paths under this domain
